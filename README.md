@@ -2,7 +2,7 @@
   <h3 align="center">Project Setup Template</h3>
 
   <p align="center">
-    React Template!
+    Nodejs Template!
     <br />
     <a href="#"><strong>Explore the docs »</strong></a>
     <br />
@@ -17,11 +17,11 @@
 
 1. [About](#about)
 2. [VSCode Extensions](#vscode-extensions)
-3. [React Configuration](#react-configuration)
+3. [Nodejs Configuration](#nodejs-configuration)
 
 ## About
 
-This template contains lint settings for React
+This template contains lint settings for NodeJS
 
 ## VSCode Extensions
 
@@ -45,7 +45,7 @@ Inside your VSCode go to:
 Preferences > Settings > Search for Format On Save > Activate the option
 ```
 
-## React Configuration
+## NodeJS Configuration
 
 Before starting development you need to add some packages in dev mode.
 Run the following command in your terminal
@@ -53,11 +53,11 @@ Run the following command in your terminal
 For npm users
 
 ```sh
-npm install --save-dev prettier eslint eslint-config-airbnb eslint-config-prettier eslint-plugin-import eslint-plugin-prettier eslint-plugin-jsx-a11y eslint-plugin-react eslint-plugin-react-hooks
+npm install --save-dev prettier eslint eslint-config-airbnb-base eslint-config-prettier eslint-plugin-import eslint-plugin-prettier
 ```
 
 For yarn users
 
 ```sh
-yarn add -D prettier eslint eslint-config-airbnb eslint-config-prettier eslint-plugin-import eslint-plugin-prettier eslint-plugin-jsx-a11y eslint-plugin-react eslint-plugin-react-hooks
+yarn add -D prettier eslint eslint-config-airbnb-base eslint-config-prettier eslint-plugin-import eslint-plugin-prettier
 ```
