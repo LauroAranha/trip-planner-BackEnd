@@ -23,13 +23,24 @@
 
 This template contains lint settings for NodeJS
 
+## .env model
+
+```
+FIREBASE_APIKEY=
+FIREBASE_AUTHDOMAIN=
+FIREBASE_PROJECTID=
+FIREBASE_STORAGEBUCKET=
+FIREBASE_MESSAGINGSENDERID=
+FIREBASE_APPID=
+```
+
 ## VSCode Extensions
 
 Required vscode extensions for lint settings to work
 
-- [EditorConfig for VS Code](https://marketplace.visualstudio.com/items?itemName=EditorConfig.EditorConfig)
-- [Prettier - Code formatter](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
-- [Eslint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint)
+-   [EditorConfig for VS Code](https://marketplace.visualstudio.com/items?itemName=EditorConfig.EditorConfig)
+-   [Prettier - Code formatter](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
+-   [Eslint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint)
 
 After installing the extensions, do the following configuration:
 
