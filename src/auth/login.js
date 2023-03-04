@@ -6,7 +6,9 @@ import { auth } from '../firebase.js';
  *  @param {String} email
  *  @param {String} password
  *  @returns {CurrentUserInfo} current user object
+ *
  */
+
 export const signIn = async (email, password) => {
     const response = signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
