@@ -7,7 +7,7 @@ import { addDocInCollection } from '../crud/firebaseOperations.js';
 import { errorHandler } from '../utils/firebaseErrorHandler.js';
 
 /**
- *  Checks if user is registred in firebase auth and returns all the user information in an object.
+ *  Checks if user is registered in firebase auth and returns all the user information in an object.
  *  @param {String} email
  *  @param {String} password
  *  @returns {CurrentUserInfo} current user object
