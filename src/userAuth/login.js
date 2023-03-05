@@ -2,13 +2,12 @@ import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../config/firebase.js';
 
 /**
- *  @description Checks if user is registred in firebase auth and returns all the user information in an object.
+ *  Checks if user is registred in firebase auth and returns all the user information in an object.
  *  @param {String} email
  *  @param {String} password
  *  @returns {CurrentUserInfo} current user object
  *
  */
-
 export const signIn = async (email, password) => {
     const response = signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
