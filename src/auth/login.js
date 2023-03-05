@@ -1,5 +1,5 @@
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../firebase.js';
+import { auth } from '../config/firebase.js';
 
 /**
  *  @description Checks if user is registred in firebase auth and returns all the user information in an object.
