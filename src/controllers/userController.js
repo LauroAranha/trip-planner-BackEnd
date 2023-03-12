@@ -29,10 +29,7 @@ const loginUser = async (payload) => {
 
 const getUser = async (payload) => {
     try {
-        const results = await listDocFromCollectionWithId(
-            'users',
-            'dkUN4qua9CvRZpCjs4Kp',
-        );
+        const results = await listDocFromCollectionWithId('users', payload);
         return {
             status: 200,
             message: `Usuário resgatado: ${JSON.stringify(results)}`,
@@ -46,8 +43,8 @@ const editUser = async (payload) => {
     try {
         const results = await updateDocumentInCollection(
             'users',
-            'dkUN4qua9CvRZpCjs4Kp',
-            payload,
+            payload.id,
+            payload.data,
         );
         return { status: 200, message: 'Usuário editado' };
     } catch (err) {
@@ -57,10 +54,7 @@ const editUser = async (payload) => {
 
 const deleteUser = async (payload) => {
     try {
-        const results = await deleteDocumentInCollection(
-            'users',
-            'dkUN4qua9CvRZpCjs4Kp',
-        );
+        const results = await deleteDocumentInCollection('users', payload);
         return { status: 200, message: 'Usuário apagado' };
     } catch (err) {
         logger.error(err);
