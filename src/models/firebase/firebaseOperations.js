@@ -1,4 +1,12 @@
-import { collection, doc, getDoc, getDocs, addDoc, updateDoc, deleteDoc } from 'firebase/firestore';
+import {
+    collection,
+    doc,
+    getDoc,
+    getDocs,
+    addDoc,
+    updateDoc,
+    deleteDoc,
+} from 'firebase/firestore';
 import { db } from '../../config/firebase.js';
 import { errorHandler } from '../../utils/firebaseErrorHandler.js';
 
@@ -83,7 +91,6 @@ export const addDocInCollection = async (firebaseCollectionName, docData) => {
     }
 };
 
-
 /** Update a document using its id
  * @param {String} firebaseCollectionName
  * @param {String} documentId
@@ -97,15 +104,19 @@ export const addDocInCollection = async (firebaseCollectionName, docData) => {
  * updateTripInformation;
  * ```
  */
-export const updateDocumentInCollection = async (firebaseCollectionName, documentId, newDocData) => {
+export const updateDocumentInCollection = async (
+    firebaseCollectionName,
+    documentId,
+    newDocData,
+) => {
     try {
+        console.log(firebaseCollectionName, documentId, newDocData);
         const targetReference = doc(db, firebaseCollectionName, documentId);
         const docRef = await updateDoc(targetReference, {
-            ...newDocData
+            ...newDocData,
         });
 
         return docRef;
-
     } catch (error) {
         errorHandler(error);
     }
@@ -123,10 +134,13 @@ export const updateDocumentInCollection = async (firebaseCollectionName, documen
  * updateTripInformation;
  * ```
  */
-export const deleteDocumentInCollection = async (firebaseCollectionName, documentId) => {
+export const deleteDocumentInCollection = async (
+    firebaseCollectionName,
+    documentId,
+) => {
     try {
         const targetReference = doc(db, firebaseCollectionName, documentId);
-        const docRef = await deleteDoc(targetReference)
+        const docRef = await deleteDoc(targetReference);
         return docRef;
     } catch (error) {
         errorHandler(error);

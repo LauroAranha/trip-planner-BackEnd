@@ -3,12 +3,18 @@ import { logger } from '../utils/logger.js';
 import { signUp } from '../models/firebase/userAuth/register.js';
 import { signIn } from '../models/firebase/userAuth/login.js';
 
+import {
+    updateDocumentInCollection,
+    listDocFromCollectionWithId,
+    deleteDocumentInCollection,
+} from '../models/firebase/firebaseOperations.js';
+
 const registerUser = async (payload) => {
     try {
         const results = await signUp(payload);
         return { status: 200, message: 'Usuário registrado' };
     } catch (err) {
-        logger.error('Deu erro');
+        logger.error(err);
     }
 };
 
@@ -17,8 +23,48 @@ const loginUser = async (payload) => {
         const results = await signIn(payload);
         return { status: 200, message: 'Usuário logado' };
     } catch (err) {
-        logger.error('Deu erro');
+        logger.error(err);
     }
 };
 
-export { registerUser, loginUser };
+const getUser = async (payload) => {
+    try {
+        const results = await listDocFromCollectionWithId(
+            'users',
+            'dkUN4qua9CvRZpCjs4Kp',
+        );
+        return {
+            status: 200,
+            message: `Usuário resgatado: ${JSON.stringify(results)}`,
+        };
+    } catch (err) {
+        logger.error(err);
+    }
+};
+
+const editUser = async (payload) => {
+    try {
+        const results = await updateDocumentInCollection(
+            'users',
+            'dkUN4qua9CvRZpCjs4Kp',
+            payload,
+        );
+        return { status: 200, message: 'Usuário editado' };
+    } catch (err) {
+        logger.error(err);
+    }
+};
+
+const deleteUser = async (payload) => {
+    try {
+        const results = await deleteDocumentInCollection(
+            'users',
+            'dkUN4qua9CvRZpCjs4Kp',
+        );
+        return { status: 200, message: 'Usuário apagado' };
+    } catch (err) {
+        logger.error(err);
+    }
+};
+
+export { registerUser, loginUser, editUser, getUser, deleteUser };

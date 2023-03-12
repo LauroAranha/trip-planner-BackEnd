@@ -28,18 +28,17 @@ import { logger } from '../../../utils/logger.js';
 export const signUp = async (userInformation) => {
     const { email, password } = userInformation;
     try {
-        createUserWithEmailAndPassword(auth, email, password)
-            .then((userCredential) => {
+        await createUserWithEmailAndPassword(auth, email, password)
+            .then(async (userCredential) => {
                 // Signed up succesfully
                 const user = userCredential.user;
                 logger.info(`User created on auth succesfully! ${email}`);
+                await addDocInCollection('users', userInformation);
                 return user;
             })
             .catch((error) => {
                 errorHandler(error);
             });
-
-        await addDocInCollection('users', userInformation);
     } catch (error) {
         errorHandler(error);
     }
