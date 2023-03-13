@@ -6,8 +6,8 @@ import { signIn } from '../models/firebase/userAuth/login.js';
 import {
     updateDocumentInCollection,
     listDocFromCollectionWithId,
-    deleteDocumentInCollection,
 } from '../models/firebase/firebaseOperations.js';
+import { deleteUserFA } from '../models/firebase/userAuth/deleteUser.js';
 
 const registerUser = async (payload) => {
     try {
@@ -54,7 +54,7 @@ const editUser = async (payload) => {
 
 const deleteUser = async (payload) => {
     try {
-        const results = await deleteDocumentInCollection('users', payload);
+        const results = await deleteUserFA('users', payload);
         return { status: 200, message: 'Usuário apagado' };
     } catch (err) {
         logger.error(err);
