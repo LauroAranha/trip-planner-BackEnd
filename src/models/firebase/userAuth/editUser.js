@@ -8,7 +8,7 @@ import { signIn } from './login.js';
 import { collection, getDocs, where, query } from 'firebase/firestore';
 import { signUp } from './register.js';
 
-export const editUser = async (currentUser, newUserInformation) => {
+export const editUserFA = async (currentUser, newUserInformation) => {
     const { email, password } = newUserInformation
     if (email) {
         updateEmail(currentUser, email).then(async () => {

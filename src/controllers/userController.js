@@ -41,7 +41,7 @@ const getUser = async (payload) => {
 
 const editUser = async (payload) => {
     try {
-        const results = await updateDocumentInCollection(
+        const results = await editUserFA(
             'users',
             payload.id,
             payload.data,

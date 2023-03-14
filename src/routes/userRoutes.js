@@ -6,6 +6,7 @@ import {
     registerUser,
     deleteUser,
 } from '../controllers/userController.js';
+import { editUserFA } from '../models/firebase/userAuth/editUser.js';
 
 const router = express.Router();
 
@@ -31,7 +32,7 @@ router.post('/login', async (req, res) => {
 
 router.put('/edit', async (req, res) => {
     try {
-        const results = await editUser(req.body);
+        const results = await editUserFA(req.body);
         res.status(results.status).send(results.message);
     } catch (err) {
         logger.error(err);
