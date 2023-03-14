@@ -6,6 +6,7 @@ import {
     registerUser,
     deleteUser,
 } from '../controllers/userController.js';
+import { deleteUserFA } from '../models/firebase/userAuth/deleteUser.js';
 import { editUserFA } from '../models/firebase/userAuth/editUser.js';
 
 const router = express.Router();
@@ -48,9 +49,9 @@ router.get('/get', async (req, res) => {
     }
 });
 
-router.delete('/delete', async (req, res) => {
+router.post('/delete', async (req, res) => {
     try {
-        const results = await deleteUser(req.body);
+        const results = await deleteUserFA(req.body);
         res.status(results.status).send(results.message);
     } catch (err) {
         logger.error(err);
