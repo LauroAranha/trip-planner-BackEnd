@@ -37,6 +37,3 @@ export const editUserFA = async (currentUser, newUserInformation) => {
         await updateDocumentInCollection('users', uid, newUserInformation);
     });
 };
-
-const b = await signIn({ email: "lauro@aranha.com", password: "lauro123" })
-b
