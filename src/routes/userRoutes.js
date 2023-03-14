@@ -31,7 +31,7 @@ router.post('/login', async (req, res) => {
     }
 });
 
-router.put('/edit', async (req, res) => {
+router.post('/edit', async (req, res) => {
     try {
         const results = await editUserFA(req.body);
         res.status(results.status).send(results.message);

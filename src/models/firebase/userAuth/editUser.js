@@ -8,8 +8,18 @@ import { signIn } from './login.js';
 import { collection, getDocs, where, query } from 'firebase/firestore';
 import { signUp } from './register.js';
 
-export const editUserFA = async (currentUser, newUserInformation) => {
-    const { email, password } = newUserInformation
+export const editUserFA = async (userInfo) => {
+    console.log(userInfo);
+    const currentUserEmail = userInfo.currentEmail
+    const currentUserPassword = userInfo.currentPassword
+    let currentUser
+    const getCurrentUser = await signIn({ email: currentUserEmail, password: currentUserPassword }).then(async () => {
+        currentUser = auth.currentUser
+    })
+    getCurrentUser
+    console.log(currentUser);
+
+    const { email, password } = userInfo
     if (email) {
         updateEmail(currentUser, email).then(async () => {
             console.log("email updated!")
@@ -34,6 +44,7 @@ export const editUserFA = async (currentUser, newUserInformation) => {
     querySnapshot.forEach(async (doc) => {
         console.log(doc.id);
         uid = doc.id
-        await updateDocumentInCollection('users', uid, newUserInformation);
+        delete userInfo.currentEmail, userInfo.currentPassword
+        await updateDocumentInCollection('users', uid, userInfo);
     });
 };
