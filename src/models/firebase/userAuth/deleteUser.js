@@ -10,7 +10,15 @@ import { collection, getDocs, where, query } from 'firebase/firestore';
 
 
 
-export const deleteUserFA = async (user) => {
+export const deleteUserFA = async (userInfo) => {
+    const email = userInfo.email
+    const password = userInfo.password
+    let user
+    const a = await signIn({ email: email, password: password }).then(async () => {
+        user = auth.currentUser
+    })
+    a
+    console.log(user);
     try {
         await deleteUser(user)
             .then(async () => {
