@@ -15,12 +15,13 @@ export const signIn = async (userInformation) => {
         .then((userCredential) => {
             let user = userCredential.user;
             logger.info('User logged in! ' + user.email);
-            return user;
+            return { status: 200, message: user };
         })
         .catch((error) => {
             const errorCode = error.code;
             const errorMessage = error.message;
             logger.error(`Error code ${errorCode}: ${errorMessage}`);
+            throw new Error(error)
         });
     return response;
 };
