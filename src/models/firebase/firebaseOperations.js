@@ -9,6 +9,7 @@ import {
 } from 'firebase/firestore';
 import { db } from '../../config/firebase.js';
 import { errorHandler } from '../../utils/firebaseErrorHandler.js';
+import { logger } from '../../utils/logger.js';
 
 /** Get all documents from one collection
  * @param {String} firebaseCollectionName
@@ -58,9 +59,10 @@ export const listDocFromCollectionWithId = async (
             return document.data();
         } else {
             // doc.data() will be undefined in this case
-            console.error(
+            logger.error(
                 'No such document. Check if the collection or document names are inserted correctly.',
             );
+            return;
         }
     } catch (error) {
         errorHandler(error);
