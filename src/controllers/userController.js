@@ -3,49 +3,52 @@ import { logger } from '../utils/logger.js';
 import { signUp } from '../models/firebase/userAuth/register.js';
 import { signIn } from '../models/firebase/userAuth/login.js';
 
-import {
-    updateDocumentInCollection,
-    listDocFromCollectionWithId,
-} from '../models/firebase/firebaseOperations.js';
+import { listDocFromCollectionWithId } from '../models/firebase/firebaseOperations.js';
 import { deleteUserFA } from '../models/firebase/userAuth/deleteUser.js';
 
 const registerUser = async (payload) => {
     try {
         const results = await signUp(payload);
-        return { status: 200, message: 'Usuário registrado' };
+        return { status: 200, message: 'Usuário registrado!' };
     } catch (err) {
         logger.error(err);
+        return {
+            status: 401,
+            message: err,
+        };
     }
 };
 
 const loginUser = async (payload) => {
     try {
         const results = await signIn(payload);
-        return { status: 200, message: JSON.stringify(results) };
+        return { status: 200, message: 'Usuário logado!' };
     } catch (err) {
-        logger.error(err)
+        logger.error(err);
         return {
             status: 401,
-            message: JSON.stringify(err.message),
-        }
+            message: err,
+        };
     }
 };
 
 const getUser = async (payload) => {
     try {
-        const results = await listDocFromCollectionWithId('users', payload.userId);
+        const results = await listDocFromCollectionWithId(
+            'users',
+            payload.userId,
+        );
         if (results) {
             return {
                 status: 200,
-                message: JSON.stringify(results),
+                message: 'Usuário resgatado!',
             };
         } else {
             return {
                 status: 404,
-                message: "User not found",
+                message: 'O usuário não foi encontrado!',
             };
         }
-
     } catch (err) {
         logger.error(err);
         return {
@@ -57,12 +60,8 @@ const getUser = async (payload) => {
 
 const editUser = async (payload) => {
     try {
-        const results = await editUserFA(
-            'users',
-            payload.id,
-            payload.data,
-        );
-        return { status: 200, message: 'Usuário editado' };
+        const results = await editUserFA('users', payload.id, payload.data);
+        return { status: 200, message: 'Usuário editado!' };
     } catch (err) {
         logger.error(err);
     }

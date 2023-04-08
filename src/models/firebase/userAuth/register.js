@@ -16,7 +16,8 @@ import { logger } from '../../../utils/logger.js';
  *  @param {String} userInformation.email
  *  @param {String} userInformation.name
  *  @param {String} userInformation.address
- *  @param {String} password
+ *  @param {String} currentPassword
+ *  @param {String} confirmPassword
  *  @returns {CurrentUserInfo} current user object
  *  ```
  *  const signUpUser = await signUp({
@@ -26,9 +27,9 @@ import { logger } from '../../../utils/logger.js';
  *  ```
  */
 export const signUp = async (userInformation) => {
-    const { email, password } = userInformation;
+    const { email, currentPassword } = userInformation;
     try {
-        await createUserWithEmailAndPassword(auth, email, password)
+        await createUserWithEmailAndPassword(auth, email, currentPassword)
             .then(async (userCredential) => {
                 // Signed up succesfully
                 const user = userCredential.user;

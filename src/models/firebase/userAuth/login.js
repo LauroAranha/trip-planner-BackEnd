@@ -10,8 +10,8 @@ import { logger } from '../../../utils/logger.js';
  *
  */
 export const signIn = async (userInformation) => {
-    const { email, password } = userInformation;
-    const response = signInWithEmailAndPassword(auth, email, password)
+    const { email, currentPassword } = userInformation;
+    const response = signInWithEmailAndPassword(auth, email, currentPassword)
         .then((userCredential) => {
             let user = userCredential.user;
             logger.info('User logged in! ' + user.email);
@@ -21,7 +21,7 @@ export const signIn = async (userInformation) => {
             const errorCode = error.code;
             const errorMessage = error.message;
             logger.error(`Error code ${errorCode}: ${errorMessage}`);
-            throw new Error(error)
+            throw new Error(error);
         });
     return response;
 };
