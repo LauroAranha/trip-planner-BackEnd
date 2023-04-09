@@ -1,6 +1,6 @@
 import { logger } from '../utils/logger.js';
 
-import { addDocInCollection, listAllDocsFromCollection, queryDocumentInCollection } from '../models/firebase/firebaseOperations.js'
+import { addDocInCollection, deleteDocumentInCollection, listAllDocsFromCollection, queryDocumentInCollection } from '../models/firebase/firebaseOperations.js'
 
 const getAllTravels = async () => {
     try {
@@ -63,6 +63,30 @@ const getRecomendedTravels = async (payload) => {
             return {
                 status: 500,
                 message: "Error",
+            };
+        }
+    } catch (err) {
+        logger.error(err);
+        return {
+            status: 500,
+            message: err,
+        };
+    }
+};
+
+export const deleteTravel = async (payload) => {
+    const travelId = payload.documentId
+    try {
+        const results = await deleteDocumentInCollection('travel', travelId)
+        if (results) {
+            return {
+                status: 200,
+                message: "Document deleted succesfully",
+            };
+        } else {
+            return {
+                status: 500,
+                message: "Document was not deleted",
             };
         }
     } catch (err) {
