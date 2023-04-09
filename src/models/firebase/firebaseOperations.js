@@ -6,6 +6,8 @@ import {
     addDoc,
     updateDoc,
     deleteDoc,
+    where,
+    query
 } from 'firebase/firestore';
 import { db } from '../../config/firebase.js';
 import { errorHandler } from '../../utils/firebaseErrorHandler.js';
@@ -143,6 +145,37 @@ export const deleteDocumentInCollection = async (
         const targetReference = doc(db, firebaseCollectionName, documentId);
         const docRef = await deleteDoc(targetReference);
         return docRef;
+    } catch (error) {
+        errorHandler(error);
+    }
+};
+
+/** Deletes a document using its id
+ * @param {String} firebaseCollectionName
+ * @param {String} propertyName
+ * @param {String} operator
+ * @param {String} value
+ * @example
+ * ```
+ * const query = await queryDocumentInCollection('users', 'age', '>', '50');
+ * console.log(query);
+ * ```
+ */
+export const queryDocumentInCollection = async (
+    firebaseCollectionName,
+    propertyName,
+    operator,
+    value
+) => {
+    try {
+        const docRef = await collection(db, firebaseCollectionName)
+        const queryResult = await query(docRef, where(propertyName, operator, value));
+        const querySnapshot = await getDocs(queryResult);
+        let queryData = []
+        querySnapshot.forEach(async (doc) => {
+            queryData.push(doc.data())
+        });
+        return queryData
     } catch (error) {
         errorHandler(error);
     }
