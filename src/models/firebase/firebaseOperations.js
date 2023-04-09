@@ -130,11 +130,8 @@ export const updateDocumentInCollection = async (
  * @param {String} documentId
  * @example
  * ```
- * const updateTripInformation = await updateDocumentInCollection('test', "6ps5BkZ4O3YIc9b3Lk48", {
- *  documentField01: 'Hello',
- *  documentField02: 'world'
- * });
- * updateTripInformation;
+ * const deleteDocument = await deleteDocumentInCollection('collectionName', "6ps5BkZ4O3YIc9b3Lk48");
+ * deleteDocument;
  * ```
  */
 export const deleteDocumentInCollection = async (
@@ -150,7 +147,7 @@ export const deleteDocumentInCollection = async (
     }
 };
 
-/** Deletes a document using its id
+/** Queries a document using its property, the operator you want and value you want
  * @param {String} firebaseCollectionName
  * @param {String} propertyName
  * @param {String} operator
