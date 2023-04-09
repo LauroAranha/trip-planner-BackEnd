@@ -9,7 +9,7 @@ import { deleteUserFA } from '../models/firebase/userAuth/deleteUser.js';
 const registerUser = async (payload) => {
     try {
         const results = await signUp(payload);
-        return { status: 200, message: 'Usuário registrado!' };
+        return { status: 200, message: 'Usuário registrado!', data: results };
     } catch (err) {
         logger.error(err);
         return {
@@ -22,7 +22,7 @@ const registerUser = async (payload) => {
 const loginUser = async (payload) => {
     try {
         const results = await signIn(payload);
-        return { status: 200, message: 'Usuário logado!' };
+        return { status: 200, message: 'Usuário logado!', data: results };
     } catch (err) {
         logger.error(err);
         return {
