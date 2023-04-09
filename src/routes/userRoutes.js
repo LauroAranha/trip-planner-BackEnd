@@ -16,7 +16,7 @@ import { logger } from '../utils/logger.js';
 router.post('/register', async (req, res) => {
     try {
         const results = await registerUser(req.body);
-        res.status(results.status).send(results.message);
+        res.status(results.status).send(results);
     } catch (err) {
         logger.error(err);
     }
@@ -25,7 +25,7 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
     try {
         const results = await loginUser(req.body);
-        res.status(results.status).send(JSON.stringify(results.data));
+        res.status(results.status).send(results);
     } catch (err) {
         logger.error(err);
     }
