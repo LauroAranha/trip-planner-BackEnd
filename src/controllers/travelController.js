@@ -52,7 +52,7 @@ const addTravel = async (payload) => {
 
 const getRecomendedTravels = async (payload) => {
     try {
-        const results = await queryDocumentInCollection('travel', 'rating', '>', '200')
+        const results = await queryDocumentInCollection('travel', 'rating', '>=', 200)
         if (results) {
             return {
                 status: 200,
