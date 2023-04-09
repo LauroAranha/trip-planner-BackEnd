@@ -1,6 +1,6 @@
 import { logger } from '../utils/logger.js';
 
-import { addDocInCollection, listAllDocsFromCollection } from '../models/firebase/firebaseOperations.js'
+import { addDocInCollection, listAllDocsFromCollection, queryDocumentInCollection } from '../models/firebase/firebaseOperations.js'
 
 const getAllTravels = async () => {
     try {
@@ -9,7 +9,8 @@ const getAllTravels = async () => {
         if (results) {
             return {
                 status: 200,
-                message: JSON.stringify(results),
+                message: 'Data found successfully',
+                data: results
             };
         } else {
             return {
@@ -49,4 +50,28 @@ const addTravel = async (payload) => {
     }
 };
 
-export { getAllTravels, addTravel };
+const getRecomendedTravels = async (payload) => {
+    try {
+        const results = await queryDocumentInCollection('travel', 'rating', '>', '200')
+        if (results) {
+            return {
+                status: 200,
+                message: "Query made succesfully",
+                data: results
+            };
+        } else {
+            return {
+                status: 500,
+                message: "Error",
+            };
+        }
+    } catch (err) {
+        logger.error(err);
+        return {
+            status: 500,
+            message: err,
+        };
+    }
+};
+
+export { getAllTravels, addTravel, getRecomendedTravels };
