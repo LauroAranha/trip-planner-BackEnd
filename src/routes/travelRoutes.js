@@ -3,11 +3,21 @@ import express from 'express';
 const router = express.Router();
 
 import { logger } from '../utils/logger.js';
-import { getAllTravels } from '../controllers/travelController.js';
+import { addTravel, getAllTravels } from '../controllers/travelController.js';
 
 router.get('/get/all', async (req, res) => {
     try {
         const results = await getAllTravels(req.body);
+        res.status(results.status).send(results.message);
+    } catch (err) {
+        logger.error(err);
+    }
+});
+
+router.post('/add', async (req, res) => {
+    try {
+        console.log(req);
+        const results = await addTravel(req.body);
         res.status(results.status).send(results.message);
     } catch (err) {
         logger.error(err);

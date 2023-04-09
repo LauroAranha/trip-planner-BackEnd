@@ -1,6 +1,6 @@
 import { logger } from '../utils/logger.js';
 
-import { listAllDocsFromCollection } from '../models/firebase/firebaseOperations.js'
+import { addDocInCollection, listAllDocsFromCollection } from '../models/firebase/firebaseOperations.js'
 
 const getAllTravels = async () => {
     try {
@@ -26,6 +26,27 @@ const getAllTravels = async () => {
     }
 };
 
-console.log(await getAllTravels)
+const addTravel = async (payload) => {
+    try {
+        const results = await addDocInCollection('travel', payload);
+        if (results) {
+            return {
+                status: 200,
+                message: "Document added succesfully",
+            };
+        } else {
+            return {
+                status: 500,
+                message: "Error",
+            };
+        }
+    } catch (err) {
+        logger.error(err);
+        return {
+            status: 500,
+            message: err,
+        };
+    }
+};
 
-export { getAllTravels };
+export { getAllTravels, addTravel };
