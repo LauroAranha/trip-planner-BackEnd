@@ -98,4 +98,30 @@ export const deleteTravel = async (payload) => {
     }
 };
 
+export const getCurrentUserTravels = async (payload) => {
+    const currentUserId = payload.currentUserId
+    try {
+        const results = await queryDocumentInCollection('travel', 'userCreatorId', '==', currentUserId)
+        if (results) {
+            return {
+                status: 200,
+                message: "Query made succesfully",
+                data: results
+            };
+        } else {
+            return {
+                status: 500,
+                message: "Error",
+            };
+        }
+    } catch (err) {
+        logger.error(err);
+        return {
+            status: 500,
+            message: err,
+        };
+    }
+};
+
+
 export { getAllTravels, addTravel, getRecomendedTravels };
