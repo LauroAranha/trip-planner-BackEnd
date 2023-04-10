@@ -2,6 +2,10 @@ import { logger } from '../utils/logger.js';
 
 import { addDocInCollection, deleteDocumentInCollection, listAllDocsFromCollection, queryDocumentInCollection } from '../models/firebase/firebaseOperations.js'
 
+/**
+ * Get all travels
+ * @returns {Object} all travels
+ */
 const getAllTravels = async () => {
     try {
         const results = await listAllDocsFromCollection('travel');
@@ -27,6 +31,43 @@ const getAllTravels = async () => {
     }
 };
 
+/**
+ * Add travel 
+ * @param {Object} payload
+ * @param {String} payload.title
+ * @param {String} payload.description
+ * @param {String} payload.image
+ * @param {boolean} payload.criancaOk
+ * @param {boolean} payload.petOk
+ * @param {String} payload.recomendacaoTransporte
+ * @param {String} payload.pontoInicial
+ * @param {String} payload.pontoFinal
+ * @param {double} payload.custoMedio
+ * @param {Object} payload.paradasRecomendadas
+ * @param {String} payload.paradasRecomendadas.arrayIndex
+ * @returns {String} response message
+ * ```
+ * Post example:
+ * {
+ *     "title": "Mockup Roteiro",
+ *     "description": "Descrição maneira",
+ *     "image": "https://i.pinimg.com/280x280_RS/3f/b5/27/3fb527a657ea80ec279e7b399a112929.jpg",
+ *     "cidadeRoteiro": "Sao Paulo",
+ *     "pontoInicial": "Ermelino Matarazzo",
+ *     "pontoFinal": "Mooca",
+ *     "recomendacaoTransporte": "transportePublico",
+ *     "custoMedio": "1000",
+ *     "petsOk": "true",
+ *     "criancaOk": "true",
+ *     "paradasRecomendadas": [
+ *         "Fatec Zona Leste",
+ *         "Delegacia de Polícia",
+ *         "Cemitério da Saudade"
+ *     ]
+ * }
+ * 
+ * ```
+ */
 const addTravel = async (payload) => {
     try {
         const results = await addDocInCollection('travel', payload);
@@ -50,7 +91,11 @@ const addTravel = async (payload) => {
     }
 };
 
-const getRecomendedTravels = async (payload) => {
+/**
+ * Get the recommended travels (basically all travels that have a rating above 200)
+ * @returns {Object} all travels linked to certain user
+ */
+const getRecomendedTravels = async () => {
     try {
         const results = await queryDocumentInCollection('travel', 'rating', '>=', 200)
         if (results) {
@@ -74,8 +119,23 @@ const getRecomendedTravels = async (payload) => {
     }
 };
 
+
+// TODO Change success and error responses, currently they are only return error no matter what. To confirm if a document was really deleted, check it out in firebase
+/**
+ * Delete a travel doc using its id 
+ * @param {Object} payload
+ * @param {String} payload.travelId
+ * @returns {Object}
+ * ```
+ * Post example:
+ * {
+ *     "travelId": "2Rp0A5n0gvhjvMIZ0a34"
+ * }
+ * 
+ * ```
+ */
 export const deleteTravel = async (payload) => {
-    const travelId = payload.documentId
+    const travelId = payload.travelId
     try {
         const results = await deleteDocumentInCollection('travel', travelId)
         if (results) {
@@ -98,6 +158,20 @@ export const deleteTravel = async (payload) => {
     }
 };
 
+
+/**
+ * Get current user registered travels
+ * @param {Object} payload
+ * @param {String} payload.currentUserId
+ * @returns {Object} all travels linked to certain user
+ * ```
+ * Post example:
+ * {
+ *     "currentUserId": "2Rp0A5n0gvhjvMIZ0PfE"
+ * }
+ * 
+ * ```
+ */
 export const getCurrentUserTravels = async (payload) => {
     const currentUserId = payload.currentUserId
     try {
