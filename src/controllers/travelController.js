@@ -173,9 +173,10 @@ export const deleteTravel = async (payload) => {
  * ```
  */
 export const getCurrentUserTravels = async (payload) => {
-    const currentUserId = payload.currentUserId
+    const userCreatorId = payload.userCreatorId
+    console.log(payload);
     try {
-        const results = await queryDocumentInCollection('travel', 'userCreatorId', '==', currentUserId)
+        const results = await queryDocumentInCollection('travel', 'userCreatorId', '==', userCreatorId)
         if (results) {
             return {
                 status: 200,
