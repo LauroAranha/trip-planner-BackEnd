@@ -182,7 +182,9 @@ export const queryDocumentInCollection = async (
         const querySnapshot = await getDocs(queryResult);
         let queryData = []
         querySnapshot.forEach(async (doc) => {
-            queryData.push(doc.data())
+            let data = doc.data()
+            let docId = doc.id
+            queryData.push({ ...data, docId })
         });
         return queryData
     } catch (error) {
