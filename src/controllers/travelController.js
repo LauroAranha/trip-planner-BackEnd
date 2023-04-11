@@ -146,7 +146,7 @@ export const deleteTravel = async (payload) => {
         } else {
             return {
                 status: 500,
-                message: "Document was not deleted",
+                message: "Document was not deleted, check if it exists or if the ID was inserted correctly",
             };
         }
     } catch (err) {

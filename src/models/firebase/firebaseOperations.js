@@ -139,9 +139,21 @@ export const deleteDocumentInCollection = async (
     documentId,
 ) => {
     try {
+        const searchForDocument = await listDocFromCollectionWithId(firebaseCollectionName, documentId)
+
+        if (!searchForDocument) {
+            throw new Error('No document with the provided ID');
+        }
+
         const targetReference = doc(db, firebaseCollectionName, documentId);
         const docRef = await deleteDoc(targetReference);
-        return docRef;
+
+        const searchForDocument2 = await listDocFromCollectionWithId(firebaseCollectionName, documentId)
+        if (!searchForDocument2) {
+            return 1;
+        }
+        throw new Error('Failed to delete. Check the document ID.')
+
     } catch (error) {
         errorHandler(error);
     }
