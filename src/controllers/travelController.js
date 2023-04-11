@@ -1,6 +1,6 @@
 import { logger } from '../utils/logger.js';
 
-import { addDocInCollection, deleteDocumentInCollection, listAllDocsFromCollection, queryDocumentInCollection } from '../models/firebase/firebaseOperations.js'
+import { addDocInCollection, deleteDocumentInCollection, listAllDocsFromCollection, queryDocumentInCollection, updateDocumentInCollection } from '../models/firebase/firebaseOperations.js'
 
 /**
  * Get all travels
@@ -198,5 +198,33 @@ export const getCurrentUserTravels = async (payload) => {
     }
 };
 
+const editTravelDetails = async (payload) => {
+    const documentId = payload.documentId
+    const newDocData = payload.newDocData
+    console.log(payload);
+    try {
+        const results = await updateDocumentInCollection('travel', documentId, newDocData)
+        if (results) {
+            return {
+                status: 200,
+                message: "Update made succesfully",
+                data: results
+            };
+        } else {
+            return {
+                status: 500,
+                message: "Error",
+            };
+        }
+    } catch (err) {
+        logger.error(err);
+        return {
+            status: 500,
+            message: err,
+        };
+    }
+};
 
-export { getAllTravels, addTravel, getRecomendedTravels };
+console.log(await editTravelDetails({ documentId: "1WO8pCBv6YGwhD60bDRr", newDocData: { cidadeRoteiro: "Guatemala1" } }))
+
+export { getAllTravels, addTravel, getRecomendedTravels, editTravelDetails };

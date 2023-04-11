@@ -119,7 +119,7 @@ export const updateDocumentInCollection = async (
             ...newDocData,
         });
 
-        return docRef;
+        return 1;
     } catch (error) {
         errorHandler(error);
     }

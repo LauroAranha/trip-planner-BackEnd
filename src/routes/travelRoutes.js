@@ -62,4 +62,13 @@ router.post('/getCurrentUserTravels', async (req, res) => {
     }
 });
 
+router.post('/edit', async (req, res) => {
+    try {
+        const results = await editTravelDetails(req.body);
+        res.status(results.status).send(results);
+    } catch (err) {
+        logger.error(err);
+    }
+});
+
 export default router;
