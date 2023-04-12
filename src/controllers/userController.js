@@ -3,7 +3,10 @@ import { logger } from '../utils/logger.js';
 import { signUp } from '../models/firebase/userAuth/register.js';
 import { signIn } from '../models/firebase/userAuth/login.js';
 
-import { listDocFromCollectionWithId } from '../models/firebase/firebaseOperations.js';
+import {
+    listDocFromCollectionWithId,
+    queryDocumentInCollection,
+} from '../models/firebase/firebaseOperations.js';
 import { deleteUserFA } from '../models/firebase/userAuth/deleteUser.js';
 
 const registerUser = async (payload) => {
@@ -34,14 +37,16 @@ const loginUser = async (payload) => {
 
 const getUser = async (payload) => {
     try {
-        const results = await listDocFromCollectionWithId(
+        const results = await queryDocumentInCollection(
             'users',
+            'userId',
+            '==',
             payload.userId,
         );
         if (results) {
             return {
                 status: 200,
-                message: 'Usuário resgatado!',
+                message: results[0],
             };
         } else {
             return {

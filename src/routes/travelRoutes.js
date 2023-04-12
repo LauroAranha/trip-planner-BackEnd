@@ -3,8 +3,14 @@ import express from 'express';
 const router = express.Router();
 
 import { logger } from '../utils/logger.js';
-import { addTravel, deleteTravel, getAllTravels, getCurrentUserTravels, getRecomendedTravels } from '../controllers/travelController.js';
-
+import {
+    addTravel,
+    deleteTravel,
+    editTravelDetails,
+    getAllTravels,
+    getCurrentUserTravels,
+    getRecomendedTravels,
+} from '../controllers/travelController.js';
 
 /**
  * Get all travels that we have in firebase
@@ -19,7 +25,6 @@ router.get('/get/all', async (req, res) => {
         logger.error(err);
     }
 });
-
 
 /**
  * Add a travel in database

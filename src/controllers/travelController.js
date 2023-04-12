@@ -1,6 +1,12 @@
 import { logger } from '../utils/logger.js';
 
-import { addDocInCollection, deleteDocumentInCollection, listAllDocsFromCollection, queryDocumentInCollection, updateDocumentInCollection } from '../models/firebase/firebaseOperations.js'
+import {
+    addDocInCollection,
+    deleteDocumentInCollection,
+    listAllDocsFromCollection,
+    queryDocumentInCollection,
+    updateDocumentInCollection,
+} from '../models/firebase/firebaseOperations.js';
 
 /**
  * Get all travels
@@ -14,12 +20,12 @@ const getAllTravels = async () => {
             return {
                 status: 200,
                 message: 'Data found successfully',
-                data: results
+                data: results,
             };
         } else {
             return {
                 status: 404,
-                message: "Any data found",
+                message: 'Any data found',
             };
         }
     } catch (err) {
@@ -32,7 +38,7 @@ const getAllTravels = async () => {
 };
 
 /**
- * Add travel 
+ * Add travel
  * @param {Object} payload
  * @param {String} payload.title
  * @param {String} payload.description
@@ -65,7 +71,7 @@ const getAllTravels = async () => {
  *         "Cemitério da Saudade"
  *     ]
  * }
- * 
+ *
  * ```
  */
 const addTravel = async (payload) => {
@@ -74,12 +80,12 @@ const addTravel = async (payload) => {
         if (results) {
             return {
                 status: 200,
-                message: "Document added succesfully",
+                message: 'Document added succesfully',
             };
         } else {
             return {
                 status: 500,
-                message: "Error",
+                message: 'Error',
             };
         }
     } catch (err) {
@@ -97,17 +103,22 @@ const addTravel = async (payload) => {
  */
 const getRecomendedTravels = async () => {
     try {
-        const results = await queryDocumentInCollection('travel', 'rating', '>=', 200)
+        const results = await queryDocumentInCollection(
+            'travel',
+            'rating',
+            '>=',
+            200,
+        );
         if (results) {
             return {
                 status: 200,
-                message: "Query made succesfully",
-                data: results
+                message: 'Query made succesfully',
+                data: results,
             };
         } else {
             return {
                 status: 500,
-                message: "Error",
+                message: 'Error',
             };
         }
     } catch (err) {
@@ -119,10 +130,9 @@ const getRecomendedTravels = async () => {
     }
 };
 
-
 // TODO Change success and error responses, currently they are only return error no matter what. To confirm if a document was really deleted, check it out in firebase
 /**
- * Delete a travel doc using its id 
+ * Delete a travel doc using its id
  * @param {Object} payload
  * @param {String} payload.travelId
  * @returns {Object}
@@ -131,22 +141,23 @@ const getRecomendedTravels = async () => {
  * {
  *     "travelId": "2Rp0A5n0gvhjvMIZ0a34"
  * }
- * 
+ *
  * ```
  */
 export const deleteTravel = async (payload) => {
-    const travelId = payload.travelId
+    const travelId = payload.travelId;
     try {
-        const results = await deleteDocumentInCollection('travel', travelId)
+        const results = await deleteDocumentInCollection('travel', travelId);
         if (results) {
             return {
                 status: 200,
-                message: "Document deleted succesfully",
+                message: 'Document deleted succesfully',
             };
         } else {
             return {
                 status: 500,
-                message: "Document was not deleted, check if it exists or if the ID was inserted correctly",
+                message:
+                    'Document was not deleted, check if it exists or if the ID was inserted correctly',
             };
         }
     } catch (err) {
@@ -157,7 +168,6 @@ export const deleteTravel = async (payload) => {
         };
     }
 };
-
 
 /**
  * Get current user registered travels
@@ -169,24 +179,29 @@ export const deleteTravel = async (payload) => {
  * {
  *     "currentUserId": "2Rp0A5n0gvhjvMIZ0PfE"
  * }
- * 
+ *
  * ```
  */
 export const getCurrentUserTravels = async (payload) => {
-    const userCreatorId = payload.userCreatorId
+    const userCreatorId = payload.userCreatorId;
     console.log(payload);
     try {
-        const results = await queryDocumentInCollection('travel', 'userCreatorId', '==', userCreatorId)
+        const results = await queryDocumentInCollection(
+            'travel',
+            'userCreatorId',
+            '==',
+            userCreatorId,
+        );
         if (results) {
             return {
                 status: 200,
-                message: "Query made succesfully",
-                data: results
+                message: 'Query made succesfully',
+                data: results,
             };
         } else {
             return {
                 status: 500,
-                message: "Error",
+                message: 'Error',
             };
         }
     } catch (err) {
@@ -199,21 +214,25 @@ export const getCurrentUserTravels = async (payload) => {
 };
 
 const editTravelDetails = async (payload) => {
-    const documentId = payload.documentId
-    const newDocData = payload.newDocData
+    const documentId = payload.documentId;
+    const newDocData = payload.newDocData;
     console.log(payload);
     try {
-        const results = await updateDocumentInCollection('travel', documentId, newDocData)
+        const results = await updateDocumentInCollection(
+            'travel',
+            documentId,
+            newDocData,
+        );
         if (results) {
             return {
                 status: 200,
-                message: "Update made succesfully",
-                data: results
+                message: 'Update made succesfully',
+                data: results,
             };
         } else {
             return {
                 status: 500,
-                message: "Error",
+                message: 'Error',
             };
         }
     } catch (err) {
@@ -224,7 +243,5 @@ const editTravelDetails = async (payload) => {
         };
     }
 };
-
-console.log(await editTravelDetails({ documentId: "1WO8pCBv6YGwhD60bDRr", newDocData: { cidadeRoteiro: "Guatemala1" } }))
 
 export { getAllTravels, addTravel, getRecomendedTravels, editTravelDetails };

@@ -40,9 +40,9 @@ router.put('/edit', async (req, res) => {
     }
 });
 
-router.get('/get', async (req, res) => {
+router.get('/get/:userId', async (req, res) => {
     try {
-        const results = await getUser(req.body);
+        const results = await getUser(req.params);
         res.status(results.status).send(results.message);
     } catch (err) {
         logger.error(err);
