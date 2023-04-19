@@ -25,18 +25,15 @@ export const listAllDocsFromCollection = async (firebaseCollectionName) => {
     try {
         const getCollection = collection(db, firebaseCollectionName);
         const docsFromCollection = await getDocs(getCollection);
-        if (docsFromCollection != []) {
+        if (docsFromCollection.docs.length > 0) {
             const docsList = docsFromCollection.docs.map((doc) => doc.data());
-
             return docsList;
         } else {
-            // docsFromCollection will be an empty array in this case
-            console.log(
-                'No such collection. Check if the collection name is correct.',
-            );
+            logger.info("No data found")
+            return;
         }
     } catch (error) {
-        errorHandler(error);
+        return new Error(error, 'No such collection name. Check if it is correct or if it exists.')
     }
 };
 
@@ -60,16 +57,15 @@ export const listDocFromCollectionWithId = async (
         if (document.exists()) {
             return document.data();
         } else {
-            // doc.data() will be undefined in this case
-            logger.error(
-                'No such document. Check if the collection or document names are inserted correctly.',
-            );
+            logger.info("No data found")
             return;
         }
     } catch (error) {
-        errorHandler(error);
+        errorHandler(error, 'No such collection name. Check if it is correct or if it exists.');
     }
 };
+
+//console.log(await listDocFromCollectionWithId('users', '2Rp0A5n0gvhjvMIZ0PfEa'));
 
 /** Add a document with an auto-generated id to certain collection
  * @param {String} firebaseCollectionName

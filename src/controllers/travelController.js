@@ -14,9 +14,8 @@ import {
  */
 const getAllTravels = async () => {
     try {
-        const results = await listAllDocsFromCollection('travel');
-        console.log(await results);
-        if (results) {
+        const results = await listAllDocsFromCollection('useraa');
+        if (results != undefined || results != null) { // Check if results array has data
             return {
                 status: 200,
                 message: 'Data found successfully',
@@ -25,14 +24,13 @@ const getAllTravels = async () => {
         } else {
             return {
                 status: 404,
-                message: 'Any data found',
+                message: 'No data found',
             };
         }
     } catch (err) {
-        logger.error(err);
         return {
             status: 500,
-            message: err,
+            message: err.toString(),
         };
     }
 };
