@@ -14,7 +14,7 @@ import {
  */
 const getAllTravels = async () => {
     try {
-        const results = await listAllDocsFromCollection('useraa');
+        const results = await listAllDocsFromCollection('travel');
         if (results != undefined || results != null) { // Check if results array has data
             return {
                 status: 200,
