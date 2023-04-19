@@ -12,26 +12,20 @@ import {
  * Get all travels
  * @returns {Object} all travels
  */
-const getAllTravels = async () => {
+const getAllTravels = async (req, res) => {
     try {
-        const results = await listAllDocsFromCollection('useraa');
-        if (results != undefined || results != null) { // Check if results array has data
-            return {
-                status: 200,
+        const results = await listAllDocsFromCollection('travel');
+        if (results != undefined || results != null) {
+            // Check if results array has data
+            res.status(200).send({
                 message: 'Data found successfully',
                 data: results,
-            };
+            });
         } else {
-            return {
-                status: 404,
-                message: 'No data found',
-            };
+            res.status(404).send('No data found');
         }
     } catch (err) {
-        return {
-            status: 500,
-            message: err.toString(),
-        };
+        res.status(500).send(err.toString());
     }
 };
 
@@ -72,26 +66,17 @@ const getAllTravels = async () => {
  *
  * ```
  */
-const addTravel = async (payload) => {
+const addTravel = async (req, res) => {
     try {
-        const results = await addDocInCollection('travel', payload);
+        const results = await addDocInCollection('travel', req.body);
         if (results) {
-            return {
-                status: 200,
-                message: 'Document added succesfully',
-            };
+            res.status(201).send('Document added succesfully');
         } else {
-            return {
-                status: 500,
-                message: 'Error',
-            };
+            res.status(500).send('Error');
         }
     } catch (err) {
         logger.error(err);
-        return {
-            status: 500,
-            message: err,
-        };
+        res.status(500).send(err);
     }
 };
 
@@ -99,7 +84,7 @@ const addTravel = async (payload) => {
  * Get the recommended travels (basically all travels that have a rating above 200)
  * @returns {Object} all travels linked to certain user
  */
-const getRecomendedTravels = async () => {
+const getRecomendedTravels = async (req, res) => {
     try {
         const results = await queryDocumentInCollection(
             'travel',
@@ -108,23 +93,16 @@ const getRecomendedTravels = async () => {
             200,
         );
         if (results) {
-            return {
-                status: 200,
-                message: 'Query made succesfully',
+            res.status(200).send({
+                message: 'Data found successfully',
                 data: results,
-            };
+            });
         } else {
-            return {
-                status: 500,
-                message: 'Error',
-            };
+            res.status(500).send('Error');
         }
     } catch (err) {
         logger.error(err);
-        return {
-            status: 500,
-            message: err,
-        };
+        res.status(500).send(err);
     }
 };
 
@@ -142,28 +120,21 @@ const getRecomendedTravels = async () => {
  *
  * ```
  */
-export const deleteTravel = async (payload) => {
-    const travelId = payload.travelId;
+export const deleteTravel = async (req, res) => {
+    const travelId = req.params.travelId;
     try {
         const results = await deleteDocumentInCollection('travel', travelId);
         if (results) {
-            return {
-                status: 200,
-                message: 'Document deleted succesfully',
-            };
+            res.status(200).send({
+                message: 'Document deleted successfully',
+                data: results,
+            });
         } else {
-            return {
-                status: 500,
-                message:
-                    'Document was not deleted, check if it exists or if the ID was inserted correctly',
-            };
+            res.status(500).send('Error');
         }
     } catch (err) {
         logger.error(err);
-        return {
-            status: 500,
-            message: err,
-        };
+        res.status(500).send(err);
     }
 };
 
@@ -180,9 +151,8 @@ export const deleteTravel = async (payload) => {
  *
  * ```
  */
-export const getCurrentUserTravels = async (payload) => {
-    const userCreatorId = payload.userCreatorId;
-    console.log(payload);
+export const getCurrentUserTravels = async (req, res) => {
+    const userCreatorId = req.params.userId;
     try {
         const results = await queryDocumentInCollection(
             'travel',
@@ -191,30 +161,22 @@ export const getCurrentUserTravels = async (payload) => {
             userCreatorId,
         );
         if (results) {
-            return {
-                status: 200,
-                message: 'Query made succesfully',
+            res.status(200).send({
+                message: 'Data found successfully',
                 data: results,
-            };
+            });
         } else {
-            return {
-                status: 500,
-                message: 'Error',
-            };
+            res.status(500).send('Error');
         }
     } catch (err) {
         logger.error(err);
-        return {
-            status: 500,
-            message: err,
-        };
+        res.status(500).send(err);
     }
 };
 
-const editTravelDetails = async (payload) => {
-    const documentId = payload.documentId;
-    const newDocData = payload.newDocData;
-    console.log(payload);
+const editTravelDetails = async (req, res) => {
+    const documentId = req.body.documentId;
+    const newDocData = req.body.newDocData;
     try {
         const results = await updateDocumentInCollection(
             'travel',
@@ -222,23 +184,16 @@ const editTravelDetails = async (payload) => {
             newDocData,
         );
         if (results) {
-            return {
-                status: 200,
-                message: 'Update made succesfully',
+            res.status(200).send({
+                message: 'Update made successfully',
                 data: results,
-            };
+            });
         } else {
-            return {
-                status: 500,
-                message: 'Error',
-            };
+            res.status(500).send('Error');
         }
     } catch (err) {
         logger.error(err);
-        return {
-            status: 500,
-            message: err,
-        };
+        res.status(500).send(err);
     }
 };
 
