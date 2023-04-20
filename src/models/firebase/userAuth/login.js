@@ -20,21 +20,22 @@ import { errorHandler } from '../../../utils/firebaseErrorHandler.js';
  */
 export const signIn = async (userInformation) => {
     const { email, password } = userInformation;
-
     try {
+        let response = {}
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         logger.info(`User authenticated: ${userCredential.user.email}`);
 
         const customToken = await admin.auth().createCustomToken(userCredential.user.uid);
+        response.token = await customToken
         logger.info('Token generated');
 
-        const userInfo = await signInWithCustomToken(auth, customToken);
-        logger.info(userInfo);
+        await signInWithCustomToken(auth, customToken);
+        response.currentUserInfo = await auth.currentUser
 
-        await setPersistence(auth, browserSessionPersistence);
+        console.log(response);
 
-        return userInfo;
+        return response;
     } catch (error) {
         errorHandler(error, 'User not authenticated!')
     }
-};
+}; 
