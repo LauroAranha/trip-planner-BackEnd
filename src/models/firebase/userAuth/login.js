@@ -31,8 +31,7 @@ export const signIn = async (userInformation) => {
 
         await signInWithCustomToken(auth, customToken);
         response.currentUserInfo = await auth.currentUser
-
-        console.log(response);
+        logger.info('Got current user information succesfully');
 
         return response;
     } catch (error) {
