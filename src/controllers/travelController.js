@@ -199,7 +199,6 @@ const editTravelDetails = async (req, res) => {
 };
 
 const getTravelDetails = async (req, res) => {
-    console.log(req.params);
     const documentId = req.params.travelId;
     try {
         const results = await listDocFromCollectionWithId(
