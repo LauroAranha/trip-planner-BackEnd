@@ -10,6 +10,7 @@ import {
     getAllTravels,
     getCurrentUserTravels,
     getRecomendedTravels,
+    getTravelDetails
 } from '../controllers/travelController.js';
 
 /**
@@ -30,7 +31,9 @@ router.get('/recommendedTravels', getRecomendedTravels);
 
 router.delete('/delete/:travelId', deleteTravel);
 
-router.post('/getCurrentUserTravels/:userId', getCurrentUserTravels);
+router.get('/get/:travelId', getTravelDetails);
+
+router.get('/getCurrentUserTravels/:userId', getCurrentUserTravels);
 
 router.post('/edit', editTravelDetails);
 

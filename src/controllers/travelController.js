@@ -7,6 +7,7 @@ import {
     queryDocumentInCollection,
     updateDocumentInCollection,
 } from '../models/firebase/firebaseOperations.js';
+import { listDocFromCollectionWithId } from '../models/firebase/firebaseOperations.js';
 
 /**
  * Get all travels
@@ -197,4 +198,26 @@ const editTravelDetails = async (req, res) => {
     }
 };
 
-export { getAllTravels, addTravel, getRecomendedTravels, editTravelDetails };
+const getTravelDetails = async (req, res) => {
+    console.log(req.params);
+    const documentId = req.params.travelId;
+    try {
+        const results = await listDocFromCollectionWithId(
+            'travel',
+            documentId,
+        );
+        if (results) {
+            res.status(200).send({
+                message: 'Travel details found!',
+                data: results,
+            });
+        } else {
+            res.status(500).send('Error');
+        }
+    } catch (err) {
+        logger.error(err);
+        res.status(500).send(err);
+    }
+};
+
+export { getAllTravels, addTravel, getRecomendedTravels, editTravelDetails, getTravelDetails };
