@@ -121,7 +121,7 @@ const getRecomendedTravels = async (req, res) => {
  *
  * ```
  */
-export const deleteTravel = async (req, res) => {
+const deleteTravel = async (req, res) => {
     const travelId = req.params.travelId;
     try {
         const results = await deleteDocumentInCollection('travel', travelId);
@@ -152,7 +152,7 @@ export const deleteTravel = async (req, res) => {
  *
  * ```
  */
-export const getCurrentUserTravels = async (req, res) => {
+const getCurrentUserTravels = async (req, res) => {
     const userCreatorId = req.params.userId;
     try {
         const results = await queryDocumentInCollection(
@@ -220,4 +220,4 @@ const getTravelDetails = async (req, res) => {
     }
 };
 
-export { getAllTravels, addTravel, getRecomendedTravels, editTravelDetails, getTravelDetails };
+export { getAllTravels, addTravel, getRecomendedTravels, deleteTravel, getCurrentUserTravels, editTravelDetails, getTravelDetails };
