@@ -9,6 +9,13 @@ import {
 } from '../models/firebase/firebaseOperations.js';
 import { listDocFromCollectionWithId } from '../models/firebase/firebaseOperations.js';
 
+const removeEmptyAttrs = (obj) => {
+    var entries = Object.entries(obj).filter(function (entry) {
+        return entry[1] !== "";
+    });
+    return Object.fromEntries(entries);
+}
+
 /**
  * Get all roadmaps
  * @returns {Object} all roadmaps
@@ -177,7 +184,8 @@ const getCurrentUserRoadmaps = async (req, res) => {
 
 const editRoadmapDetails = async (req, res) => {
     const documentId = req.body.documentId;
-    const newDocData = req.body.newDocData;
+    const newDocData = removeEmptyAttrs(req.body.newDocData);
+
     try {
         const results = await updateDocumentInCollection(
             'roadmap',

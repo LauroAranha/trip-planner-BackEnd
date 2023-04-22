@@ -35,6 +35,6 @@ router.get('/get/:roadmapId', getRoadmapDetails);
 
 router.get('/getCurrentUserRoadmaps/:userId', getCurrentUserRoadmaps);
 
-router.post('/edit', editRoadmapDetails);
+router.put('/edit', editRoadmapDetails);
 
 export default router;
