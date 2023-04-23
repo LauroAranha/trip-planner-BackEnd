@@ -3,18 +3,12 @@ import {
     getAuth,
     signInWithEmailAndPassword,
 } from 'firebase/auth';
-import serviceAccount from '../../../donotcommit/trip-planner-b0cfe-firebase-adminsdk-e4r7b-d2eb2a11d7.json' assert { type: 'json' };
 import { auth } from '../../../config/firebase.js';
+import '../../../config/admin.js';
 import { addDocInCollection } from '../firebaseOperations.js';
 import { errorHandler } from '../../../utils/firebaseErrorHandler.js';
 
 import { logger } from '../../../utils/logger.js';
-
-import admin from 'firebase-admin';
-
-admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-});
 
 //TODO Complete research over required user information
 /**

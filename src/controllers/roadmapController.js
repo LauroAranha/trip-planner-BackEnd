@@ -7,15 +7,24 @@ import {
     queryDocumentInCollection,
     updateDocumentInCollection,
 } from '../models/firebase/firebaseOperations.js';
+import { listDocFromCollectionWithId } from '../models/firebase/firebaseOperations.js';
+
+const removeEmptyAttrs = (obj) => {
+    var entries = Object.entries(obj).filter(function (entry) {
+        return entry[1] !== '';
+    });
+    return Object.fromEntries(entries);
+};
 
 /**
- * Get all travels
- * @returns {Object} all travels
+ * Get all roadmaps
+ * @returns {Object} all roadmaps
  */
-const getAllTravels = async (req, res) => {
+const getAllRoadmaps = async (req, res) => {
     try {
-        const results = await listAllDocsFromCollection('travel');
+        const results = await listAllDocsFromCollection('roadmap');
         if (results != undefined || results != null) {
+            // Check if results array has data
             res.status(200).send({
                 message: 'Data found successfully',
                 data: results,
@@ -29,7 +38,7 @@ const getAllTravels = async (req, res) => {
 };
 
 /**
- * Add travel
+ * Add roadmap
  * @param {Object} payload
  * @param {String} payload.title
  * @param {String} payload.description
@@ -65,9 +74,9 @@ const getAllTravels = async (req, res) => {
  *
  * ```
  */
-const addTravel = async (req, res) => {
+const addRoadmap = async (req, res) => {
     try {
-        const results = await addDocInCollection('travel', req.body);
+        const results = await addDocInCollection('roadmap', req.body);
         if (results) {
             res.status(201).send('Document added succesfully');
         } else {
@@ -80,13 +89,13 @@ const addTravel = async (req, res) => {
 };
 
 /**
- * Get the recommended travels (basically all travels that have a rating above 200)
- * @returns {Object} all travels linked to certain user
+ * Get the recommended roadmaps (basically all roadmaps that have a rating above 200)
+ * @returns {Object} all roadmaps linked to certain user
  */
-const getRecomendedTravels = async (req, res) => {
+const getRecomendedRoadmaps = async (req, res) => {
     try {
         const results = await queryDocumentInCollection(
-            'travel',
+            'roadmap',
             'rating',
             '>=',
             200,
@@ -107,24 +116,27 @@ const getRecomendedTravels = async (req, res) => {
 
 // TODO Change success and error responses, currently they are only return error no matter what. To confirm if a document was really deleted, check it out in firebase
 /**
- * Delete a travel doc using its id
+ * Delete a roadmap doc using its id
  * @param {Object} payload
- * @param {String} payload.travelId
+ * @param {String} payload.roadmapId
  * @returns {Object}
  * ```
  * Post example:
  * {
- *     "travelId": "2Rp0A5n0gvhjvMIZ0a34"
+ *     "roadmapId": "2Rp0A5n0gvhjvMIZ0a34"
  * }
  *
  * ```
  */
-export const deleteTravel = async (req, res) => {
-    const travelId = req.params.travelId;
+const deleteRoadmap = async (req, res) => {
+    const roadmapId = req.params.roadmapId;
     try {
-        const results = await deleteDocumentInCollection('travel', travelId);
+        const results = await deleteDocumentInCollection('roadmap', roadmapId);
         if (results) {
-            res.status(200).send('Document deleted successfully');
+            res.status(200).send({
+                message: 'Document deleted successfully',
+                data: results,
+            });
         } else {
             res.status(500).send('Error');
         }
@@ -135,10 +147,10 @@ export const deleteTravel = async (req, res) => {
 };
 
 /**
- * Get current user registered travels
+ * Get current user registered roadmaps
  * @param {Object} payload
  * @param {String} payload.currentUserId
- * @returns {Object} all travels linked to certain user
+ * @returns {Object} all roadmaps linked to certain user
  * ```
  * Post example:
  * {
@@ -147,13 +159,12 @@ export const deleteTravel = async (req, res) => {
  *
  * ```
  */
-export const getCurrentUserTravels = async (req, res) => {
+const getCurrentUserRoadmaps = async (req, res) => {
     const userCreatorId = req.params.userId;
-    console.log(userCreatorId);
     try {
         const results = await queryDocumentInCollection(
-            'travel',
-            'currentUserId',
+            'roadmap',
+            'userCreatorId',
             '==',
             userCreatorId,
         );
@@ -171,17 +182,21 @@ export const getCurrentUserTravels = async (req, res) => {
     }
 };
 
-const editTravelDetails = async (req, res) => {
+const editRoadmapDetails = async (req, res) => {
     const documentId = req.body.documentId;
-    const newDocData = req.body.newDocData;
+    const newDocData = removeEmptyAttrs(req.body.newDocData);
+
     try {
         const results = await updateDocumentInCollection(
-            'travel',
+            'roadmap',
             documentId,
             newDocData,
         );
         if (results) {
-            res.status(200).send('Update made successfully');
+            res.status(200).send({
+                message: 'Update made successfully',
+                data: results,
+            });
         } else {
             res.status(500).send('Error');
         }
@@ -191,4 +206,35 @@ const editTravelDetails = async (req, res) => {
     }
 };
 
-export { getAllTravels, addTravel, getRecomendedTravels, editTravelDetails };
+const getRoadmapDetails = async (req, res) => {
+    const documentId = req.params.roadmapId;
+    try {
+        const results = await listDocFromCollectionWithId(
+            'roadmap',
+            documentId,
+        );
+        if (results) {
+            res.status(200).send({
+                message: 'Roadmap details found!',
+                data: results,
+            });
+        } else {
+            res.status(404).send({
+                message: 'Roadmap details found!',
+            });
+        }
+    } catch (err) {
+        logger.error(err);
+        res.status(500).send(err);
+    }
+};
+
+export {
+    getAllRoadmaps,
+    addRoadmap,
+    getRecomendedRoadmaps,
+    deleteRoadmap,
+    getCurrentUserRoadmaps,
+    editRoadmapDetails,
+    getRoadmapDetails,
+};
