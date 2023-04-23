@@ -2,7 +2,6 @@ import express from 'express';
 
 const router = express.Router();
 
-import { logger } from '../utils/logger.js';
 import {
     addTravel,
     deleteTravel,
@@ -30,8 +29,8 @@ router.get('/recommendedTravels', getRecomendedTravels);
 
 router.delete('/delete/:travelId', deleteTravel);
 
-router.post('/getCurrentUserTravels/:userId', getCurrentUserTravels);
+router.get('/getCurrentUserTravels/:userId', getCurrentUserTravels);
 
-router.post('/edit', editTravelDetails);
+router.put('/edit', editTravelDetails);
 
 export default router;

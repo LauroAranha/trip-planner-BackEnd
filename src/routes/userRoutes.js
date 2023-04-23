@@ -17,6 +17,6 @@ router.put('/edit', editUserFA);
 
 router.get('/get/:userId', getUser);
 
-router.post('/delete/:userId', deleteUserFA);
+router.delete('/delete/:userId', deleteUserFA);
 
 export default router;

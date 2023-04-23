@@ -16,7 +16,6 @@ const getAllTravels = async (req, res) => {
     try {
         const results = await listAllDocsFromCollection('travel');
         if (results != undefined || results != null) {
-            // Check if results array has data
             res.status(200).send({
                 message: 'Data found successfully',
                 data: results,
@@ -125,10 +124,7 @@ export const deleteTravel = async (req, res) => {
     try {
         const results = await deleteDocumentInCollection('travel', travelId);
         if (results) {
-            res.status(200).send({
-                message: 'Document deleted successfully',
-                data: results,
-            });
+            res.status(200).send('Document deleted successfully');
         } else {
             res.status(500).send('Error');
         }
@@ -153,10 +149,11 @@ export const deleteTravel = async (req, res) => {
  */
 export const getCurrentUserTravels = async (req, res) => {
     const userCreatorId = req.params.userId;
+    console.log(userCreatorId);
     try {
         const results = await queryDocumentInCollection(
             'travel',
-            'userCreatorId',
+            'currentUserId',
             '==',
             userCreatorId,
         );
@@ -184,10 +181,7 @@ const editTravelDetails = async (req, res) => {
             newDocData,
         );
         if (results) {
-            res.status(200).send({
-                message: 'Update made successfully',
-                data: results,
-            });
+            res.status(200).send('Update made successfully');
         } else {
             res.status(500).send('Error');
         }
