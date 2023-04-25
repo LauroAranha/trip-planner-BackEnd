@@ -9,6 +9,7 @@ import {
     editRoadmapDetails,
     getAllRoadmaps,
     getCurrentUserRoadmaps,
+    getPublicRoadmaps,
     getRecomendedRoadmaps,
     getRoadmapDetails
 } from '../controllers/roadmapController.js';
@@ -28,6 +29,8 @@ router.get('/get/all', getAllRoadmaps);
 router.post('/add', addRoadmap);
 
 router.get('/recommendedRoadmaps', getRecomendedRoadmaps);
+
+router.get('/public', getPublicRoadmaps);
 
 router.delete('/delete/:roadmapId', deleteRoadmap);
 

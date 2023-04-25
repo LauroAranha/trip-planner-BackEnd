@@ -114,6 +114,29 @@ const getRecomendedRoadmaps = async (req, res) => {
     }
 };
 
+const getPublicRoadmaps = async (req, res) => {
+    try {
+        const results = await queryDocumentInCollection(
+            'roadmap',
+            'visibilidadePublica',
+            '==',
+            true,
+        );
+        console.log(results);
+        if (results) {
+            res.status(200).send({
+                message: 'Data found successfully',
+                data: results,
+            });
+        } else {
+            res.status(500).send('Error');
+        }
+    } catch (err) {
+        logger.error(err);
+        res.status(500).send(err);
+    }
+};
+
 // TODO Change success and error responses, currently they are only return error no matter what. To confirm if a document was really deleted, check it out in firebase
 /**
  * Delete a roadmap doc using its id
@@ -237,4 +260,5 @@ export {
     getCurrentUserRoadmaps,
     editRoadmapDetails,
     getRoadmapDetails,
+    getPublicRoadmaps
 };
