@@ -4,7 +4,7 @@ import {
     signInWithEmailAndPassword,
 } from 'firebase/auth';
 import { auth } from '../../../config/firebase.js';
-import '../../../config/admin.js';
+import admin from '../../../config/admin.js';
 import { addDocInCollection } from '../firebaseOperations.js';
 import { errorHandler } from '../../../utils/firebaseErrorHandler.js';
 

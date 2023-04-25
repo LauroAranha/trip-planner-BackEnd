@@ -38,7 +38,6 @@ const getUser = async (req, res) => {
         );
         if (results) {
             res.status(200).send({
-                message: 'Usuário resgatado!',
                 data: results[0],
             });
         } else {

@@ -1,4 +1,10 @@
-import { deleteUser, signInWithCustomToken, updateEmail, updatePassword, updateProfile } from 'firebase/auth';
+import {
+    deleteUser,
+    signInWithCustomToken,
+    updateEmail,
+    updatePassword,
+    updateProfile,
+} from 'firebase/auth';
 import { auth, db } from '../../../config/firebase.js';
 import {
     deleteDocumentInCollection,
@@ -10,8 +16,7 @@ import { logger } from '../../../utils/logger.js';
 import { signIn } from './login.js';
 import { collection, getDocs, where, query } from 'firebase/firestore';
 import { signUp } from './register.js';
-
-
+import e from 'express';
 
 /**
  * Description
@@ -19,68 +24,60 @@ import { signUp } from './register.js';
  * @returns {any}
  */
 export const editUserFA = async (payload) => {
-    const token = payload.headers.auth
-    const userNewInfo = payload.body
+    const token = payload.headers.auth;
+    const userNewInfo = payload.body;
 
+    // console.log(token);
     console.log(token.slice(0, 6));
     console.log(userNewInfo);
 
     try {
-
-        const {
-            currentEmail,
-            currentPassword,
-            newEmail,
-            newPassword,
-            name,
-            adress,
-            newDisplayName,
-            newProfilePictureUrl
-        } = userNewInfo;
+        const { docId, email, currentPassword } = userNewInfo;
 
         await signInWithCustomToken(auth, token);
-        const currentUser = await auth.currentUser
+        const currentUser = await auth.currentUser;
         console.log(await auth.currentUser.displayName);
 
+        // if (newDisplayName) {
+        //     try {
+        //         await updateProfile(currentUser, {
+        //             displayName: newDisplayName,
+        //         });
+        //     } catch (error) {
+        //         errorHandler(error, 'Failed changing display name');
+        //     }
+        // }
 
-        if (newDisplayName) {
-            try {
-                await updateProfile(currentUser, {
-                    displayName: newDisplayName
-                })
-            } catch (error) {
-                errorHandler(error, 'Failed changing display name');
-            }
-        }
+        // if (newProfilePictureUrl) {
+        //     try {
+        //         await updateProfile(currentUser, {
+        //             photoURL: newProfilePictureUrl,
+        //         });
+        //     } catch (error) {
+        //         errorHandler(error, 'Failed changing profile picture');
+        //     }
+        // }
 
-        if (newProfilePictureUrl) {
+        if (email) {
             try {
-                await updateProfile(currentUser, {
-                    photoURL: newProfilePictureUrl
-                })
-            } catch (error) {
-                errorHandler(error, 'Failed changing profile picture');
-            }
-        }
-
-        if (newEmail) {
-            try {
-                await updateEmail(currentUser, newEmail)
-                logger.info('email updated now its: ' + newEmail);
+                await updateEmail(currentUser, email);
+                logger.info('email updated now its: ' + email);
             } catch (error) {
                 errorHandler(error);
                 throw new Error(error);
             }
         }
 
-        if (newPassword) {
+        if (currentPassword) {
             try {
-                await updatePassword(currentUser, newPassword)
-                logger.info('password updated, now its: ' + newPassword);
+                await updatePassword(currentUser, currentPassword);
+                logger.info('password updated, now its: ' + currentPassword);
             } catch (error) {
                 errorHandler(error, 'Failed changing password');
             }
         }
+
+        await updateDocumentInCollection('users', docId, userNewInfo);
 
         // const docRef = await collection(
         //     db,
