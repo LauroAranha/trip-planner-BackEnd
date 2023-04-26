@@ -1,16 +1,14 @@
-import serviceAccount from '../../../donotcommit/trip-planner-b0cfe-firebase-adminsdk-e4r7b-d2eb2a11d7.json' assert { type: 'json' };
 import {
+    browserSessionPersistence,
     getAuth,
+    setPersistence,
     signInWithCustomToken,
     signInWithEmailAndPassword,
 } from 'firebase/auth';
 import { auth } from '../../../config/firebase.js';
 import { logger } from '../../../utils/logger.js';
 import admin from 'firebase-admin';
-
-// admin.initializeApp({
-//     credential: admin.credential.cert(serviceAccount),
-// });
+import { errorHandler } from '../../../utils/firebaseErrorHandler.js';
 
 /**
  *  Checks email and password using auth and returns token
@@ -20,55 +18,28 @@ import admin from 'firebase-admin';
  *
  */
 export const signIn = async (userInformation) => {
-    const { email, password } = userInformation;
-    const authenticateUser = await signInWithEmailAndPassword(
-        auth,
-        email,
-        password,
-    )
-        .then((userCredential) => {
-            let user = userCredential.user;
-            logger.info(`User authenticated: ${user.email}`);
-            return { status: 200, message: user.uid };
-        })
-        .catch((error) => {
-            const errorCode = error.code;
-            const errorMessage = error.message;
-            logger.error(`Error code ${errorCode}: ${errorMessage}`);
-            throw new Error(error);
-        });
+    const { email, currentPassword } = userInformation;
+    try {
+        let response = {};
+        const userCredential = await signInWithEmailAndPassword(
+            auth,
+            email,
+            currentPassword,
+        );
+        logger.info(`User authenticated: ${userCredential.user.email}`);
 
-    const userId = authenticateUser.message;
-    let token = await admin
-        .auth()
-        .createCustomToken(userId)
-        .then((customToken) => {
-            logger.info('Token generated');
-            return customToken;
-        })
-        .catch((error) => {
-            const errorCode = error.code;
-            const errorMessage = error.message;
-            logger.error(`Error code ${errorCode}: ${errorMessage}`);
-            throw new Error(error);
-        });
+        const customToken = await admin
+            .auth()
+            .createCustomToken(userCredential.user.uid);
+        response.token = await customToken;
+        logger.info('Token generated');
 
-    return token;
+        await signInWithCustomToken(auth, customToken);
+        response.currentUserInfo = await auth.currentUser;
+        logger.info('Got current user information succesfully');
+
+        return response;
+    } catch (error) {
+        errorHandler(error, 'User not authenticated!');
+    }
 };
-
-// const a = await signIn({ email: "lauro@lauro.com", password: "lauro123" })
-
-// const { message } = await a
-
-// const teste = await signInWithCustomToken(getAuth(), await message)
-//     .then((userCredential) => {
-//         // Signed in
-//         var user = userCredential;
-//         console.log("User Credentials: " + JSON.stringify(user));
-//     })
-//     .catch((error) => {
-//         const errorCode = error.code;
-//         const errorMessage = error.message;
-//         logger.error(`Error code ${errorCode}: ${errorMessage}`);
-//         throw new Error(error)
-//     })

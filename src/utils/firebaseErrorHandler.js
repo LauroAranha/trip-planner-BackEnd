@@ -1,9 +1,16 @@
 import { logger } from './logger.js';
 
-export const errorHandler = (error) => {
-    if (error) {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        logger.error(`Error code - ${errorCode}: ${errorMessage}`);
-    }
+
+/**
+ * Error hand
+ * @param {Error} error
+ * @param {String} customMessage
+ * @returns {any}
+ */
+export const errorHandler = (error, customMessage) => {
+    customMessage ? customMessage : '';
+    const errorCode = error && error.code ? error.code : 'Unknown Error';
+    const errorMessage = error && error.message ? error.message : 'Unknown Error';
+    console.error(`logger - Error code (${errorCode}): ${errorMessage}`);
+    throw new Error(`${customMessage}`);
 };
