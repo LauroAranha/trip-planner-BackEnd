@@ -120,7 +120,7 @@ const getPublicRoadmaps = async (req, res) => {
             'roadmap',
             'visibilidadePublica',
             '==',
-            true,
+            (true || 'true'),
         );
         console.log(results);
         if (results) {
