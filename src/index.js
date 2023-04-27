@@ -6,7 +6,7 @@ import app from './server.js';
 
 import { logger } from './utils/logger.js';
 
-const port = process.env.PORT;
+const port = process.env.PORT || 8080;
 
 app.listen(port, async () => {
     logger.info(`Running service on port ${port}`);

@@ -3,77 +3,72 @@ import { logger } from '../utils/logger.js';
 import { signUp } from '../models/firebase/userAuth/register.js';
 import { signIn } from '../models/firebase/userAuth/login.js';
 
-import {
-    updateDocumentInCollection,
-    listDocFromCollectionWithId,
-} from '../models/firebase/firebaseOperations.js';
+import { queryDocumentInCollection } from '../models/firebase/firebaseOperations.js';
+
 import { deleteUserFA } from '../models/firebase/userAuth/deleteUser.js';
 
-const registerUser = async (payload) => {
+const registerUser = async (req, res) => {
     try {
-        const results = await signUp(payload);
-        return { status: 200, message: 'Usuário registrado' };
+        const results = await signUp(req.body);
+        res.status(201).send({ message: 'Usuário registrado!', data: results });
     } catch (err) {
         logger.error(err);
+        res.status(401).send(err);
     }
 };
 
-const loginUser = async (payload) => {
+const loginUser = async (req, res) => {
     try {
-        const results = await signIn(payload);
-        return { status: 200, message: JSON.stringify(results) };
-    } catch (err) {
-        logger.error(err)
-        return {
-            status: 401,
-            message: JSON.stringify(err.message),
-        }
-    }
-};
-
-const getUser = async (payload) => {
-    try {
-        const results = await listDocFromCollectionWithId('users', payload.userId);
-        if (results) {
-            return {
-                status: 200,
-                message: JSON.stringify(results),
-            };
-        } else {
-            return {
-                status: 404,
-                message: "User not found",
-            };
-        }
-
+        const results = await signIn(req.body);
+        res.status(200).send({ message: 'Usuário logado!', data: results });
     } catch (err) {
         logger.error(err);
-        return {
-            status: 500,
-            message: err,
-        };
+        res.status(401).send(err);
     }
 };
 
-const editUser = async (payload) => {
+const getUser = async (req, res) => {
     try {
-        const results = await editUserFA(
+        const userId = req.params.userId;
+        const results = await queryDocumentInCollection(
             'users',
-            payload.id,
-            payload.data,
+            'userId',
+            '==',
+            userId,
         );
-        return { status: 200, message: 'Usuário editado' };
+        if (results) {
+            res.status(200).send({
+                data: results[0],
+            });
+        } else {
+            res.status(404).send('O usuário não foi encontrado!');
+        }
     } catch (err) {
         logger.error(err);
+        res.status(500).send(err);
     }
 };
 
-const deleteUser = async (payload) => {
+const editUser = async (req, res) => {
     try {
-        const results = await deleteUserFA('users', payload);
-        return { status: 200, message: 'Usuário apagado' };
+        const results = await editUserFA('users', req.body.id, req.body.data);
+        res.status(200).send({
+            message: 'Usuário editado!',
+            data: results[0],
+        });
     } catch (err) {
         logger.error(err);
+        res.status(500).send(err);
+    }
+};
+
+const deleteUser = async (req, res) => {
+    try {
+        const results = await deleteUserFA('users', req.params.userId);
+        res.status(200).send('Usuário apagado!');
+    } catch (err) {
+        logger.error(err);
+        res.status(500).send(err);
     }
 };
 

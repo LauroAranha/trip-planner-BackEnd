@@ -6,6 +6,8 @@ import {
     addDoc,
     updateDoc,
     deleteDoc,
+    where,
+    query
 } from 'firebase/firestore';
 import { db } from '../../config/firebase.js';
 import { errorHandler } from '../../utils/firebaseErrorHandler.js';
@@ -23,18 +25,15 @@ export const listAllDocsFromCollection = async (firebaseCollectionName) => {
     try {
         const getCollection = collection(db, firebaseCollectionName);
         const docsFromCollection = await getDocs(getCollection);
-        if (docsFromCollection != []) {
+        if (docsFromCollection.docs.length > 0) {
             const docsList = docsFromCollection.docs.map((doc) => doc.data());
-
             return docsList;
         } else {
-            // docsFromCollection will be an empty array in this case
-            console.log(
-                'No such collection. Check if the collection name is correct.',
-            );
+            logger.info("No data found")
+            return;
         }
     } catch (error) {
-        errorHandler(error);
+        return new Error(error, 'No such collection name. Check if it is correct or if it exists.')
     }
 };
 
@@ -58,16 +57,15 @@ export const listDocFromCollectionWithId = async (
         if (document.exists()) {
             return document.data();
         } else {
-            // doc.data() will be undefined in this case
-            logger.error(
-                'No such document. Check if the collection or document names are inserted correctly.',
-            );
+            logger.info("No data found")
             return;
         }
     } catch (error) {
-        errorHandler(error);
+        errorHandler(error, 'No such collection name. Check if it is correct or if it exists.');
     }
 };
+
+//console.log(await listDocFromCollectionWithId('users', '2Rp0A5n0gvhjvMIZ0PfEa'));
 
 /** Add a document with an auto-generated id to certain collection
  * @param {String} firebaseCollectionName
@@ -117,7 +115,7 @@ export const updateDocumentInCollection = async (
             ...newDocData,
         });
 
-        return docRef;
+        return 1;
     } catch (error) {
         errorHandler(error);
     }
@@ -128,11 +126,8 @@ export const updateDocumentInCollection = async (
  * @param {String} documentId
  * @example
  * ```
- * const updateTripInformation = await updateDocumentInCollection('test', "6ps5BkZ4O3YIc9b3Lk48", {
- *  documentField01: 'Hello',
- *  documentField02: 'world'
- * });
- * updateTripInformation;
+ * const deleteDocument = await deleteDocumentInCollection('collectionName', "6ps5BkZ4O3YIc9b3Lk48");
+ * deleteDocument;
  * ```
  */
 export const deleteDocumentInCollection = async (
@@ -140,9 +135,54 @@ export const deleteDocumentInCollection = async (
     documentId,
 ) => {
     try {
+        const searchForDocument = await listDocFromCollectionWithId(firebaseCollectionName, documentId)
+
+        if (!searchForDocument) {
+            throw new Error('No document with the provided ID');
+        }
+
         const targetReference = doc(db, firebaseCollectionName, documentId);
         const docRef = await deleteDoc(targetReference);
-        return docRef;
+
+        const searchForDocument2 = await listDocFromCollectionWithId(firebaseCollectionName, documentId)
+        if (!searchForDocument2) {
+            return 1;
+        }
+        throw new Error('Failed to delete. Check the document ID.')
+
+    } catch (error) {
+        errorHandler(error);
+    }
+};
+
+/** Queries a document using its property, the operator you want and value you want
+ * @param {String} firebaseCollectionName
+ * @param {String} propertyName
+ * @param {String} operator
+ * @param {String} value
+ * @example
+ * ```
+ * const query = await queryDocumentInCollection('users', 'age', '>', '50');
+ * console.log(query);
+ * ```
+ */
+export const queryDocumentInCollection = async (
+    firebaseCollectionName,
+    propertyName,
+    operator,
+    value
+) => {
+    try {
+        const docRef = await collection(db, firebaseCollectionName)
+        const queryResult = await query(docRef, where(propertyName, operator, value));
+        const querySnapshot = await getDocs(queryResult);
+        let queryData = []
+        querySnapshot.forEach(async (doc) => {
+            let data = doc.data()
+            let docId = doc.id
+            queryData.push({ ...data, docId })
+        });
+        return queryData
     } catch (error) {
         errorHandler(error);
     }
