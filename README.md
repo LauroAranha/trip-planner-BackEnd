@@ -1,30 +1,34 @@
-<p align="center">
-  <h3 align="center">Project Setup Template</h3>
-
-  <p align="center">
-    Nodejs Template!
-    <br />
-    <a href="#"><strong>Explore the docs »</strong></a>
-    <br />
-    <br />
-    <a href="/../../issues?q=label%3Atrello">Report Bug</a>
-    ·
-    <a href="/../../issues?q=label%3Atrello">Request Feature</a>
-  </p>
-</p>
-
+## Trip-planner
+Repository related to the backend part of trip-planner project. To view the frontend side of the project, visit https://github.com/LauroAranha/trip-planner-FrontEnd 
 ## Table of contents
 
 1. [About](#about)
+2. [Enviroment configuration](#enviroment-configuration)
+3. [Running the project](#running-the-project)
 2. [VSCode Extensions](#vscode-extensions)
 3. [Nodejs Configuration](#nodejs-configuration)
 
 ## About
 
-This template contains lint settings for NodeJS
+This application was made using **NodeJS**, **Express** and **Firebase** (Storage, Firestore, Auth and Admin SDK), please, refer to the provided guide in order to configure your enviroment properly and run ther application.
 
-## .env model
+## Enviroment configuration
+### Prerequisites
+To configure and run the application, you will nedd to install [NodeJS](https://nodejs.org/en/download).
 
+To create the firebase project dependencies, refer to the firebase documentation:
+https://firebase.google.com/?hl=pt
+
+To add the AdminSDK to your project, refer to the AdminSDK documentation: 
+https://firebase.google.com/docs/admin/setup?hl=pt-br
+### Installing dependencies
+To use the application properly you will need to run:
+```npm install``` 
+
+### Environment keys configuration
+You will need to create a new `.env` file containing the API key and information of your firebase project in order to create a connection with the database, the file location must be in the root of the project (trip-planner-BackEnd/.env). To do that, use the following model:
+
+### .env model
 ```
 FIREBASE_APIKEY=
 FIREBASE_AUTHDOMAIN=
@@ -32,11 +36,17 @@ FIREBASE_PROJECTID=
 FIREBASE_STORAGEBUCKET=
 FIREBASE_MESSAGINGSENDERID=
 FIREBASE_APPID=
+PORT=
 ```
 
-## VSCode Extensions
+Also, you need to add the AdminSDK key file in order to authenticate the Auth requests in the server side. After generation a new key, put it in the `donotcommit` folder, just like the following example:
+`src\donotcommit\trip-planner-...u.json`
 
-Required vscode extensions for lint settings to work
+## Running the project
+To run the project, just run `npm run dev` in the project root folder. *The nodemon dependency is installed and configured, so you probably won't need to shut down your server every time you change something*.
+
+## VSCode Extensions
+Some of the recommended vscode extensions for lint settings to work:
 
 -   [EditorConfig for VS Code](https://marketplace.visualstudio.com/items?itemName=EditorConfig.EditorConfig)
 -   [Prettier - Code formatter](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
