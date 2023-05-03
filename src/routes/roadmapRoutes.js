@@ -7,6 +7,7 @@ import {
     addRoadmap,
     deleteRoadmap,
     editRoadmapDetails,
+    editUserRating,
     getAllRoadmaps,
     getCurrentUserRoadmaps,
     getPublicRoadmaps,
@@ -39,5 +40,7 @@ router.get('/get/:roadmapId', getRoadmapDetails);
 router.get('/getCurrentUserRoadmaps/:userId', getCurrentUserRoadmaps);
 
 router.put('/edit', editRoadmapDetails);
+
+router.put('/edit/feedback', editUserRating);
 
 export default router;

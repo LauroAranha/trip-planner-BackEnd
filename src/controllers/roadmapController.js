@@ -229,6 +229,47 @@ const editRoadmapDetails = async (req, res) => {
     }
 };
 
+const editUserRating = async (req, res) => {
+    const { documentId, feedback } = req.body
+    const getDocument = await listDocFromCollectionWithId(
+        'roadmap',
+        documentId,
+    );
+    const currentRating = getDocument.rating
+
+    let newRating;
+
+    // 0 -> undefined; 1 -> like; 2 -> dislike
+    // I didnt use a switch statement here because it was causing strange behaviours
+    if (feedback === 0) {
+        console.log('we have to implement it.');
+    } else if (feedback === 1) {
+        newRating = currentRating + 1;
+    } else if (feedback === 2) {
+        newRating = currentRating - 1;
+    }
+
+    const results = await updateDocumentInCollection(
+        'roadmap',
+        documentId,
+        { rating: newRating },
+    );
+
+    try {
+        if (results) {
+            res.status(200).send({
+                message: 'Feedback sent successfully!',
+                data: results,
+            });
+        } else {
+            res.status(500).send('Error');
+        }
+    } catch (err) {
+        logger.error(err);
+        res.status(500).send(err);
+    }
+};
+
 const getRoadmapDetails = async (req, res) => {
     const documentId = req.params.roadmapId;
     try {
@@ -260,5 +301,6 @@ export {
     getCurrentUserRoadmaps,
     editRoadmapDetails,
     getRoadmapDetails,
-    getPublicRoadmaps
+    getPublicRoadmaps,
+    editUserRating
 };
