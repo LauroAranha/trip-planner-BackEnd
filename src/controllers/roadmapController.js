@@ -8,6 +8,7 @@ import {
     updateDocumentInCollection,
 } from '../models/firebase/firebaseOperations.js';
 import { listDocFromCollectionWithId } from '../models/firebase/firebaseOperations.js';
+import { arrayUnion } from 'firebase/firestore';
 
 const removeEmptyAttrs = (obj) => {
     var entries = Object.entries(obj).filter(function (entry) {
@@ -230,36 +231,41 @@ const editRoadmapDetails = async (req, res) => {
 };
 
 const editUserRating = async (req, res) => {
-    const { documentId, feedback } = req.body
-    const getDocument = await listDocFromCollectionWithId(
+    const { documentId, rating, userId } = req.body
+
+    const ratingPath = `usersRating.${userId}.rating`;
+    const updateUserFeedback = await updateDocumentInCollection(
+        'roadmap',
+        documentId,
+        {
+            [ratingPath]: rating
+        },
+    );
+
+    const getDocumentDetails = await listDocFromCollectionWithId(
         'roadmap',
         documentId,
     );
-    const currentRating = getDocument.rating
 
-    let newRating;
+    console.log(getDocumentDetails.likes);
 
-    // 0 -> undefined; 1 -> like; 2 -> dislike
-    // I didnt use a switch statement here because it was causing strange behaviours
-    if (feedback === 0) {
-        console.log('we have to implement it.');
-    } else if (feedback === 1) {
-        newRating = currentRating + 1;
-    } else if (feedback === 2) {
-        newRating = currentRating - 1;
-    }
+    const likesCount = Object.values(getDocumentDetails.usersRating).filter(x => x.rating === 1).length;
+    const dislikesCount = Object.values(getDocumentDetails.usersRating).filter(x => x.rating === 2).length;
 
-    const results = await updateDocumentInCollection(
+    await updateDocumentInCollection(
         'roadmap',
         documentId,
-        { rating: newRating },
+        {
+            likes: likesCount,
+            dislikes: dislikesCount
+        },
     );
 
     try {
-        if (results) {
+        if (updateUserFeedback) {
             res.status(200).send({
                 message: 'Feedback sent successfully!',
-                data: results,
+                data: updateUserFeedback,
             });
         } else {
             res.status(500).send('Error');
