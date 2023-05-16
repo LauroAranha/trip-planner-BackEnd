@@ -7,7 +7,7 @@ import {
     updateDoc,
     deleteDoc,
     where,
-    query
+    query,
 } from 'firebase/firestore';
 import { db } from '../../config/firebase.js';
 import { errorHandler } from '../../utils/firebaseErrorHandler.js';
@@ -29,11 +29,14 @@ export const listAllDocsFromCollection = async (firebaseCollectionName) => {
             const docsList = docsFromCollection.docs.map((doc) => doc.data());
             return docsList;
         } else {
-            logger.info("No data found")
+            logger.info('No data found');
             return;
         }
     } catch (error) {
-        return new Error(error, 'No such collection name. Check if it is correct or if it exists.')
+        return new Error(
+            error,
+            'No such collection name. Check if it is correct or if it exists.',
+        );
     }
 };
 
@@ -57,11 +60,14 @@ export const listDocFromCollectionWithId = async (
         if (document.exists()) {
             return document.data();
         } else {
-            logger.info("No data found")
+            logger.info('No data found');
             return;
         }
     } catch (error) {
-        errorHandler(error, 'No such collection name. Check if it is correct or if it exists.');
+        errorHandler(
+            error,
+            'No such collection name. Check if it is correct or if it exists.',
+        );
     }
 };
 
@@ -135,7 +141,10 @@ export const deleteDocumentInCollection = async (
     documentId,
 ) => {
     try {
-        const searchForDocument = await listDocFromCollectionWithId(firebaseCollectionName, documentId)
+        const searchForDocument = await listDocFromCollectionWithId(
+            firebaseCollectionName,
+            documentId,
+        );
 
         if (!searchForDocument) {
             throw new Error('No document with the provided ID');
@@ -144,12 +153,14 @@ export const deleteDocumentInCollection = async (
         const targetReference = doc(db, firebaseCollectionName, documentId);
         const docRef = await deleteDoc(targetReference);
 
-        const searchForDocument2 = await listDocFromCollectionWithId(firebaseCollectionName, documentId)
+        const searchForDocument2 = await listDocFromCollectionWithId(
+            firebaseCollectionName,
+            documentId,
+        );
         if (!searchForDocument2) {
             return 1;
         }
-        throw new Error('Failed to delete. Check the document ID.')
-
+        throw new Error('Failed to delete. Check the document ID.');
     } catch (error) {
         errorHandler(error);
     }
@@ -170,19 +181,22 @@ export const queryDocumentInCollection = async (
     firebaseCollectionName,
     propertyName,
     operator,
-    value
+    value,
 ) => {
     try {
-        const docRef = await collection(db, firebaseCollectionName)
-        const queryResult = await query(docRef, where(propertyName, operator, value));
+        const docRef = await collection(db, firebaseCollectionName);
+        const queryResult = await query(
+            docRef,
+            where(propertyName, operator, value),
+        );
         const querySnapshot = await getDocs(queryResult);
-        let queryData = []
+        let queryData = [];
         querySnapshot.forEach(async (doc) => {
-            let data = doc.data()
-            let docId = doc.id
-            queryData.push({ ...data, docId })
+            let data = doc.data();
+            let docId = doc.id;
+            queryData.push({ ...data, docId });
         });
-        return queryData
+        return queryData;
     } catch (error) {
         errorHandler(error);
     }

@@ -6,8 +6,8 @@ import {
     listAllDocsFromCollection,
     queryDocumentInCollection,
     updateDocumentInCollection,
-} from '../models/firebase/firebaseOperations.js';
-import { listDocFromCollectionWithId } from '../models/firebase/firebaseOperations.js';
+} from '../services/firebase/firebaseOperations.js';
+import { listDocFromCollectionWithId } from '../services/firebase/firebaseOperations.js';
 import { arrayUnion } from 'firebase/firestore';
 
 const removeEmptyAttrs = (obj) => {
@@ -121,7 +121,7 @@ const getPublicRoadmaps = async (req, res) => {
             'roadmap',
             'visibilidadePublica',
             '==',
-            (true || 'true'),
+            true || 'true',
         );
         console.log(results);
         if (results) {
@@ -231,14 +231,14 @@ const editRoadmapDetails = async (req, res) => {
 };
 
 const editUserRating = async (req, res) => {
-    const { documentId, rating, userId } = req.body
+    const { documentId, rating, userId } = req.body;
 
     const ratingPath = `usersRating.${userId}.rating`;
     const updateUserFeedback = await updateDocumentInCollection(
         'roadmap',
         documentId,
         {
-            [ratingPath]: rating
+            [ratingPath]: rating,
         },
     );
 
@@ -249,17 +249,17 @@ const editUserRating = async (req, res) => {
 
     console.log(getDocumentDetails.likes);
 
-    const likesCount = Object.values(getDocumentDetails.usersRating).filter(x => x.rating === 1).length;
-    const dislikesCount = Object.values(getDocumentDetails.usersRating).filter(x => x.rating === 2).length;
+    const likesCount = Object.values(getDocumentDetails.usersRating).filter(
+        (x) => x.rating === 1,
+    ).length;
+    const dislikesCount = Object.values(getDocumentDetails.usersRating).filter(
+        (x) => x.rating === 2,
+    ).length;
 
-    await updateDocumentInCollection(
-        'roadmap',
-        documentId,
-        {
-            likes: likesCount,
-            dislikes: dislikesCount
-        },
-    );
+    await updateDocumentInCollection('roadmap', documentId, {
+        likes: likesCount,
+        dislikes: dislikesCount,
+    });
 
     try {
         if (updateUserFeedback) {
@@ -308,5 +308,5 @@ export {
     editRoadmapDetails,
     getRoadmapDetails,
     getPublicRoadmaps,
-    editUserRating
+    editUserRating,
 };
