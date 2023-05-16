@@ -1,22 +1,22 @@
 import express from 'express';
 import {
-    controllerRegisterUser,
-    controllerLoginUser,
-    controllerEditUser,
-    controllerGetUser,
-    controllerDeleteUser,
+    getUser,
+    loginUser,
+    registerUser,
 } from '../controllers/userController.js';
+import { deleteUserFA } from '../models/firebase/userAuth/deleteUser.js';
+import { editUserFA } from '../models/firebase/userAuth/editUser.js';
 
 const router = express.Router();
 
-router.post('/register', controllerRegisterUser);
+router.post('/register', registerUser);
 
-router.post('/login', controllerLoginUser);
+router.post('/login', loginUser);
 
-router.put('/edit', controllerEditUser);
+router.put('/edit', editUserFA);
 
-router.get('/get/:userId', controllerGetUser);
+router.get('/get/:userId', getUser);
 
-router.delete('/delete/:userId', controllerDeleteUser);
+router.delete('/delete/:userId', deleteUserFA);
 
 export default router;
