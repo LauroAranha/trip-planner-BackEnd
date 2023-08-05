@@ -55,13 +55,14 @@ const loginUser = async (req, res) => {
 
 const getUser = async (req, res) => {
     try {
-        const userId = req.params.userId;
+        const { userId } = req.params;
         const results = await queryDocumentInCollection(
             'users',
             'userId',
             '==',
             userId,
         );
+
         if (results) {
             res.status(200).send({
                 data: results[0],
@@ -78,6 +79,7 @@ const getUser = async (req, res) => {
 const editUser = async (req, res) => {
     try {
         const results = await editUserFA('users', req.body.id, req.body.data);
+
         res.status(200).send({
             message: 'Usuário editado!',
             data: results[0],
@@ -91,6 +93,7 @@ const editUser = async (req, res) => {
 const deleteUser = async (req, res) => {
     try {
         const results = await deleteUserFA('users', req.params.userId);
+
         res.status(200).send('Usuário apagado!');
     } catch (err) {
         logger.error(err);
