@@ -95,7 +95,7 @@ const editUser = async (req, res) => {
 
 const deleteUser = async (req, res) => {
     try {
-        const results = await deleteUserFA('users', req.params.userId);
+        const results = await deleteUserFA(req.params.userId);
 
         res.status(200).send({ message: 'Usuário apagado!', hasError: false });
     } catch (err) {
