@@ -7,10 +7,29 @@ import { queryDocumentInCollection } from '../models/firebase/firebaseOperations
 
 import { deleteUserFA } from '../models/firebase/userAuth/deleteUser.js';
 
+const getMissingFields = (requestBody, requiredFields) => {
+    const missingFields = [];
+
+    requiredFields.forEach((field) => {
+        if (!requestBody[field]) {
+            missingFields.push(field);
+        }
+    });
+
+    return missingFields;
+}
+
 const registerUser = async (req, res) => {
     try {
+        const requiredFields = ["name", "email", "birthdate", "cep", "address", "city", "state", "cpf", "rg", "phone", "gender"];
+        const missingFields = getMissingFields(req.body, requiredFields)
+
+        if (missingFields.length > 0) {
+            return res.status(400).json({ message: `Os seguintes campos são necessários: ${missingFields.join(", ")}.` });
+        }
+
         const results = await signUp(req.body);
-        res.status(201).send({ message: 'Usuário registrado!', data: results });
+        res.status(201).send({ message: 'User registred', data: results });
     } catch (err) {
         logger.error(err);
         res.status(401).send(err);
@@ -19,6 +38,13 @@ const registerUser = async (req, res) => {
 
 const loginUser = async (req, res) => {
     try {
+        const requiredFields = ["email", "currentPassword"];
+        const missingFields = getMissingFields(req.body, requiredFields)
+
+        if (missingFields.length > 0) {
+            return res.status(400).json({ message: `Os seguintes campos são necessários: ${missingFields.join(", ")}.` });
+        }
+
         const results = await signIn(req.body);
         res.status(200).send({ message: 'Usuário logado!', data: results });
     } catch (err) {

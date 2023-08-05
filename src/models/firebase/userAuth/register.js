@@ -9,9 +9,9 @@ import { errorHandler } from '../../../utils/firebaseErrorHandler.js';
 import { logger } from '../../../utils/logger.js';
 
 export const signUp = async (userInformation) => {
-    const { email, currentPassword } = userInformation;
+    const { email, password } = userInformation;
     try {
-        await createUserWithEmailAndPassword(auth, email, currentPassword)
+        await createUserWithEmailAndPassword(auth, email, password)
             .then(async (userCredential) => {
                 // Signed up succesfully
                 const user = userCredential.user;
@@ -31,7 +31,7 @@ export const signUp = async (userInformation) => {
                         addDocInCollection('users', userInformation);
                     })
                     .catch((error) => {
-                        console.log('Error fetching user data:', error);
+                        console.log(`Error fetching user data: ${error}`);
                     });
                 return user;
             })
