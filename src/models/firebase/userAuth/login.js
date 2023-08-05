@@ -1,10 +1,4 @@
-import {
-    browserSessionPersistence,
-    getAuth,
-    setPersistence,
-    signInWithCustomToken,
-    signInWithEmailAndPassword,
-} from 'firebase/auth';
+import { getAuth, signInWithEmailAndPassword, signInWithCustomToken } from 'firebase/auth';
 import { auth } from '../../../config/firebase.js';
 import { logger } from '../../../utils/logger.js';
 import admin from 'firebase-admin';
@@ -21,22 +15,21 @@ export const signIn = async (userInformation) => {
     const { email, currentPassword } = userInformation;
     try {
         let response = {};
+
         const userCredential = await signInWithEmailAndPassword(
-            auth,
+            getAuth(),
             email,
             currentPassword,
         );
         logger.info(`User authenticated: ${userCredential.user.email}`);
 
-        const customToken = await admin
-            .auth()
-            .createCustomToken(userCredential.user.uid);
-        response.token = await customToken;
+        const customToken = await admin.auth().createCustomToken(userCredential.user.uid);
+        response.token = customToken;
         logger.info('Token generated');
 
-        await signInWithCustomToken(auth, customToken);
-        response.currentUserInfo = await auth.currentUser;
-        logger.info('Got current user information succesfully');
+        await signInWithCustomToken(getAuth(), customToken);
+        response.currentUserInfo = auth.currentUser;
+        logger.info('Got current user information successfully');
 
         return response;
     } catch (error) {
