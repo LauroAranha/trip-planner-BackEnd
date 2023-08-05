@@ -1,7 +1,5 @@
 import {
     createUserWithEmailAndPassword,
-    getAuth,
-    signInWithEmailAndPassword,
 } from 'firebase/auth';
 import { auth } from '../../../config/firebase.js';
 import admin from '../../../config/admin.js';
