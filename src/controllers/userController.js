@@ -21,7 +21,7 @@ const getMissingFields = (requestBody, requiredFields) => {
 
 const registerUser = async (req, res) => {
     try {
-        const requiredFields = ["name", "email", "birthdate", "cep", "address", "city", "state", "cpf", "rg", "phone", "gender"];
+        const requiredFields = ["name", "email", "birthdate", "cep", "address", "city", "state", "cpf", "rg", "phone", "gender", "profilepic"];
         const missingFields = getMissingFields(req.body, requiredFields)
 
         if (missingFields.length > 0) {
