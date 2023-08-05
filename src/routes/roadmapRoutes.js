@@ -2,17 +2,15 @@ import express from 'express';
 
 const router = express.Router();
 
-import { logger } from '../utils/logger.js';
 import {
     addRoadmap,
     deleteRoadmap,
     editRoadmapDetails,
-    editUserRating,
     getAllRoadmaps,
     getCurrentUserRoadmaps,
     getPublicRoadmaps,
     getRecomendedRoadmaps,
-    getRoadmapDetails
+    getRoadmapDetails,
 } from '../controllers/roadmapController.js';
 
 /**
@@ -29,7 +27,7 @@ router.get('/get/all', getAllRoadmaps);
  */
 router.post('/add', addRoadmap);
 
-router.get('/recommendedRoadmaps', getRecomendedRoadmaps);
+router.get('/getRecommendedRoadmaps', getRecomendedRoadmaps);
 
 router.get('/public', getPublicRoadmaps);
 
@@ -40,7 +38,5 @@ router.get('/get/:roadmapId', getRoadmapDetails);
 router.get('/getCurrentUserRoadmaps/:userId', getCurrentUserRoadmaps);
 
 router.put('/edit', editRoadmapDetails);
-
-router.put('/edit/feedback', editUserRating);
 
 export default router;
