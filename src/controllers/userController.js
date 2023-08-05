@@ -25,14 +25,14 @@ const registerUser = async (req, res) => {
         const missingFields = getMissingFields(req.body, requiredFields)
 
         if (missingFields.length > 0) {
-            return res.status(400).json({ message: `Os seguintes campos são necessários: ${missingFields.join(", ")}.` });
+            return res.status(400).json({ message: `Os seguintes campos são necessários: ${missingFields.join(", ")}.`, hasError: true });
         }
 
         const results = await signUp(req.body);
-        res.status(201).send({ message: 'User registred', data: results });
+        res.status(201).send({ message: 'User registred', data: results, hasError: false });
     } catch (err) {
         logger.error(err);
-        res.status(401).send(err);
+        res.status(401).send({ message: err, hasError: true });
     }
 };
 
@@ -42,14 +42,14 @@ const loginUser = async (req, res) => {
         const missingFields = getMissingFields(req.body, requiredFields)
 
         if (missingFields.length > 0) {
-            return res.status(400).json({ message: `Os seguintes campos são necessários: ${missingFields.join(", ")}.` });
+            return res.status(400).json({ message: `Os seguintes campos são necessários: ${missingFields.join(", ")}.`, hasError: true });
         }
 
         const results = await signIn(req.body);
-        res.status(200).send({ message: 'Usuário logado!', data: results });
+        res.status(200).send({ message: 'Usuário logado!', data: results, hasError: false });
     } catch (err) {
         logger.error(err);
-        res.status(401).send(err);
+        res.status(401).send({ message: err, hasError: true });
     }
 };
 
@@ -65,14 +65,16 @@ const getUser = async (req, res) => {
 
         if (results) {
             res.status(200).send({
+                message: "Usuário encontrado com sucesso",
                 data: results[0],
+                hasError: false
             });
         } else {
-            res.status(404).send('O usuário não foi encontrado!');
+            res.status(404).send({ message: 'O usuário não foi encontrado!', hasError: true });
         }
     } catch (err) {
         logger.error(err);
-        res.status(500).send(err);
+        res.status(500).send({ message: err, hasError: true });
     }
 };
 
@@ -83,10 +85,11 @@ const editUser = async (req, res) => {
         res.status(200).send({
             message: 'Usuário editado!',
             data: results[0],
+            hasError: false
         });
     } catch (err) {
         logger.error(err);
-        res.status(500).send(err);
+        res.status(500).send({ message: err, hasError: true });
     }
 };
 
@@ -94,10 +97,10 @@ const deleteUser = async (req, res) => {
     try {
         const results = await deleteUserFA('users', req.params.userId);
 
-        res.status(200).send('Usuário apagado!');
+        res.status(200).send({ message: 'Usuário apagado!', hasError: false });
     } catch (err) {
         logger.error(err);
-        res.status(500).send(err);
+        res.status(500).send({ message: err, hasError: true });
     }
 };
 
