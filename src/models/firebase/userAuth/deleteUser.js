@@ -4,6 +4,7 @@ import { errorHandler } from '../../../utils/firebaseErrorHandler.js';
 import { logger } from '../../../utils/logger.js';
 import { collection, getDocs, where, query } from 'firebase/firestore';
 import { db } from '../../../config/firebase.js';
+import { deleteObject } from 'firebase/storage';
 
 export const deleteUserFA = async (userId) => {
     try {
@@ -13,6 +14,10 @@ export const deleteUserFA = async (userId) => {
         const docRef = collection(db, 'users');
         const emailQuery = query(docRef, where('userId', '==', userId));
         const querySnapshot = await getDocs(emailQuery);
+
+        const imageRef = ref(storage, `profilePictures/${userId}`);
+        await deleteObject(imageRef)
+        console.log('Successfully deleted user from Storage');
 
         querySnapshot.forEach(async (doc) => {
             console.log(doc.id);
