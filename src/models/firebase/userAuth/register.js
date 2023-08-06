@@ -1,5 +1,5 @@
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { getStorage, ref, uploadString } from "firebase/storage";
+import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
+import { getStorage, ref, uploadString, getDownloadURL } from "firebase/storage";
 import { auth } from '../../../config/firebase.js';
 import admin from '../../../config/admin.js';
 import { addDocInCollection } from '../firebaseOperations.js';
@@ -19,6 +19,18 @@ export const signUp = async (userInformation) => {
         let authUid = userRecord.uid;
         console.log(`Successfully fetched user data: ${userRecord.toJSON()}`);
 
+        const storage = getStorage();
+        const profilePictureRef = ref(storage, `profilePictures/${authUid}`);
+        await uploadString(profilePictureRef, userInformation.profilepic, 'data_url');
+        logger.info(`Profile picture uploaded successfully!`);
+
+        const profilePictureUrl = await getDownloadURL(profilePictureRef);
+
+        await updateProfile(user, {
+            photoURL: profilePictureUrl,
+        });
+
+        userInformation.profilepic = profilePictureUrl;
         userInformation.userId = authUid;
         await addDocInCollection('users', userInformation);
 
@@ -27,4 +39,3 @@ export const signUp = async (userInformation) => {
         errorHandler(error);
     }
 };
-
