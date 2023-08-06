@@ -3,8 +3,8 @@ import { deleteDocumentInCollection } from '../firebaseOperations.js';
 import { errorHandler } from '../../../utils/firebaseErrorHandler.js';
 import { logger } from '../../../utils/logger.js';
 import { collection, getDocs, where, query } from 'firebase/firestore';
-import { db } from '../../../config/firebase.js';
-import { deleteObject } from 'firebase/storage';
+import { db, storage } from '../../../config/firebase.js';
+import { deleteObject, ref } from 'firebase/storage';
 
 export const deleteUserFA = async (userId) => {
     try {
