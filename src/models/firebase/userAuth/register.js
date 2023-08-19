@@ -20,7 +20,7 @@ export const signUp = async (userInformation) => {
         console.log(`Successfully fetched user data: ${userRecord.toJSON()}`);
 
         const storage = getStorage();
-        const profilePictureRef = ref(storage, `profilePictures/${authUid}`);
+        const profilePictureRef = ref(storage, `profile_pictures/${authUid}`);
         await uploadString(profilePictureRef, userInformation.profilepic, 'data_url');
         logger.info(`Profile picture uploaded successfully!`);
 
