@@ -6,6 +6,7 @@ import { signIn } from '../models/firebase/userAuth/login.js';
 import { queryDocumentInCollection } from '../models/firebase/firebaseOperations.js';
 
 import { deleteUserFA } from '../models/firebase/userAuth/deleteUser.js';
+import { editUserFA } from '../models/firebase/userAuth/editUser.js';
 
 const getMissingFields = (requestBody, requiredFields) => {
     const missingFields = [];
@@ -80,13 +81,10 @@ const getUser = async (req, res) => {
 
 const editUser = async (req, res) => {
     try {
-        const results = await editUserFA('users', req.body.id, req.body.data);
+        const results = await editUserFA(req);
 
-        res.status(200).send({
-            message: 'Usuário editado!',
-            data: results[0],
-            hasError: false
-        });
+        logger.info(results)
+        res.status(200).send({ message: 'Usuário editado!', data: results, hasError: false });
     } catch (err) {
         logger.error(err);
         res.status(500).send({ message: err, hasError: true });

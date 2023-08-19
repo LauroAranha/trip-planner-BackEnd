@@ -111,7 +111,7 @@ export const updateDocumentInCollection = async (
 ) => {
     try {
         const targetReference = doc(db, firebaseCollectionName, documentId);
-        const docRef = await updateDoc(targetReference, {
+        await updateDoc(targetReference, {
             ...newDocData,
         });
 

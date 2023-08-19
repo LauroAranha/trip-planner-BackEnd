@@ -5,18 +5,11 @@ import {
     updatePassword,
     updateProfile,
 } from 'firebase/auth';
-import { auth, db } from '../../../config/firebase.js';
-import {
-    deleteDocumentInCollection,
-    updateDocumentInCollection,
-} from '../firebaseOperations.js';
+import { auth } from '../../../config/firebase.js';
+import { updateDocumentInCollection } from '../firebaseOperations.js';
 import { errorHandler } from '../../../utils/firebaseErrorHandler.js';
-
 import { logger } from '../../../utils/logger.js';
-import { signIn } from './login.js';
-import { collection, getDocs, where, query } from 'firebase/firestore';
-import { signUp } from './register.js';
-import e from 'express';
+import { getDownloadURL, getStorage, ref, uploadString } from 'firebase/storage';
 
 /**
  * Description
@@ -27,51 +20,59 @@ export const editUserFA = async (payload) => {
     const token = payload.headers.auth;
     const userNewInfo = payload.body;
 
-    // console.log(token);
-    console.log(token.slice(0, 6));
-    console.log(userNewInfo);
-
     try {
-        const { docId, email, currentPassword } = userNewInfo;
+        const { email, docId, name, profilepic, password, userId } = userNewInfo;
 
         await signInWithCustomToken(auth, token);
         const currentUser = await auth.currentUser;
-        console.log(await auth.currentUser.displayName);
+        logger.info(userId)
 
-        // if (newDisplayName) {
-        //     try {
-        //         await updateProfile(currentUser, {
-        //             displayName: newDisplayName,
-        //         });
-        //     } catch (error) {
-        //         errorHandler(error, 'Failed changing display name');
-        //     }
-        // }
+        if (name) {
+            try {
+                await updateProfile(currentUser, {
+                    displayName: name,
+                });
+                logger.info('Name updated successfully');
+            } catch (error) {
+                errorHandler(error, 'Failed changing display name');
+            }
+        }
 
-        // if (newProfilePictureUrl) {
-        //     try {
-        //         await updateProfile(currentUser, {
-        //             photoURL: newProfilePictureUrl,
-        //         });
-        //     } catch (error) {
-        //         errorHandler(error, 'Failed changing profile picture');
-        //     }
-        // }
+        if (profilepic) {
+            try {
+                // Upload the new profile picture to Firebase Storage
+                const storage = getStorage();
+                const profilePictureRef = ref(storage, `profile_pictures/${userId}`);
+                await uploadString(profilePictureRef, profilepic, 'data_url');
+
+                // Get the download URL of the uploaded image
+                const downloadURL = await getDownloadURL(profilePictureRef);
+
+                // Update the user's photo URL
+                await updateProfile(currentUser, {
+                    photoURL: downloadURL,
+                });
+
+                logger.info('Image updated successfully');
+            } catch (error) {
+                errorHandler(error, 'Failed changing profile picture');
+            }
+        }
 
         if (email) {
             try {
                 await updateEmail(currentUser, email);
-                logger.info('email updated now its: ' + email);
+                logger.info('Email updated, now it\'s: ' + email);
             } catch (error) {
                 errorHandler(error);
                 throw new Error(error);
             }
         }
 
-        if (currentPassword) {
+        if (password) {
             try {
-                await updatePassword(currentUser, currentPassword);
-                logger.info('password updated, now its: ' + currentPassword);
+                await updatePassword(currentUser, password);
+                logger.info('Password updated, now it\'s: ' + password);
             } catch (error) {
                 errorHandler(error, 'Failed changing password');
             }
@@ -79,39 +80,8 @@ export const editUserFA = async (payload) => {
 
         await updateDocumentInCollection('users', docId, userNewInfo);
 
-        // const docRef = await collection(
-        //     db,
-        //     'users'.catch((error) => {
-        //         throw new Error(error);
-        //     }),
-        // );
-        // const emailQuery = await query(
-        //     docRef,
-        //     where('email', '==', currentUser.email).catch((error) => {
-        //         throw new Error(error);
-        //     }),
-        // );
-        // const querySnapshot = await getDocs(emailQuery).catch((error) => {
-        //     throw new Error(error);
-        // });
-        // let uid;
-
-        // querySnapshot
-        //     .forEach(async (doc) => {
-        //         uid = doc.id;
-        //         delete userNewInfo.currentEmail, userNewInfo.currentPassword;
-        //         await updateDocumentInCollection('users', uid, {
-        //             name: name,
-        //             adress: adress,
-        //             email: newEmail,
-        //             currentPassword: newPassword,
-        //         });
-        //     })
-        //     .catch((error) => {
-        //         throw new Error(error);
-        //     });
-        return { status: 200, message: 'Usuário atualizado' };
-    } catch (err) {
-        return { status: 500, message: err };
+        return true;
+    } catch (error) {
+        errorHandler(error);
     }
 };

@@ -1,11 +1,11 @@
 import express from 'express';
 import {
     deleteUser,
+    editUser,
     getUser,
     loginUser,
     registerUser,
 } from '../controllers/userController.js';
-import { editUserFA } from '../models/firebase/userAuth/editUser.js';
 
 const router = express.Router();
 
@@ -13,7 +13,7 @@ router.post('/register', registerUser);
 
 router.post('/login', loginUser);
 
-router.put('/edit', editUserFA);
+router.put('/edit', editUser);
 
 router.get('/get/:userId', getUser);
 
