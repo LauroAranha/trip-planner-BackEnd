@@ -116,7 +116,7 @@ const addRoadmap = async (req, res) => {
             logger.info('Profile picture uploaded successfully!');
             const urlImage = await getDownloadURL(imageRef);
 
-            updateDocumentInCollection('roadmap', result.id, { image: urlimage })
+            updateDocumentInCollection('roadmap', result.id, { image: urlImage })
 
             res.status(201).send({
                 message: 'Roteiro adicionado com sucesso',
