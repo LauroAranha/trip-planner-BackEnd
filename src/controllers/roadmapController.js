@@ -10,6 +10,8 @@ import {
 import { listDocFromCollectionWithId } from '../models/firebase/firebaseOperations.js';
 import { getDownloadURL, getStorage, ref, uploadString } from 'firebase/storage';
 import { getMissingFields } from '../utils/getMissingFields.js';
+import { collection, getDocs, query, where } from 'firebase/firestore';
+import { db } from '../config/firebase.js';
 
 const removeEmptyAttrs = (obj) => {
     var entries = Object.entries(obj).filter(function (entry) {
@@ -138,42 +140,48 @@ const addRoadmap = async (req, res) => {
     }
 };
 
-/**
- * Get the recommended roadmaps (basically all roadmaps that have a rating above 200)
- * @returns {Object} all roadmaps linked to certain user
- */
-const getRecomendedRoadmaps = async (req, res) => {
+const getRecommendedRoadmaps = async (req, res) => {
     try {
-        queryDocumentInCollection('roadmap', 'rating', '>=', 200)
-            .then((results) => {
-                if (results.length) {
-                    res.status(200).send({
-                        message: 'Dados encontrados com sucesso',
-                        data: results,
-                        hasError: false,
-                    });
-                } else {
-                    res.status(400).send({
-                        message: 'Nenhum dado encontrado',
-                        hasError: false,
-                    });
-                }
-            })
-            .catch((err) => {
-                logger.error(err);
-                res.status(500).send({
-                    message: 'Não foi possível fazer a consulta',
-                    hasError: true,
-                });
+        const roadmapRef = collection(db, 'roadmap');
+
+        // we need to create indexes in firebase in order to make compound queries, if there are no indexes created for some query,
+        // firebase will provide a link to automatically create it via an error message. 
+        const compoundQuery = query(
+            roadmapRef,
+            where('rating', '>=', 200),
+            where('visibilidadePublica', '==', true)
+        );
+
+        const querySnapshot = await getDocs(compoundQuery);
+        const results = [];
+
+        querySnapshot.forEach((doc) => {
+            const data = doc.data();
+            const docId = doc.id;
+            results.push({ ...data, docId });
+        });
+
+        if (results.length) {
+            res.status(200).send({
+                message: 'Dados encontrados com sucesso',
+                data: results,
+                hasError: false,
             });
+        } else {
+            res.status(400).send({
+                message: 'Nenhum dado encontrado',
+                hasError: false,
+            });
+        }
     } catch (err) {
         logger.error(err);
         res.status(500).send({
-            message: 'Aconteceu algo errado com a requisição',
+            message: 'Não foi possível fazer a consulta',
             hasError: true,
         });
     }
 };
+
 
 const getPublicRoadmaps = async (req, res) => {
     try {
@@ -369,7 +377,7 @@ const getRoadmapDetails = async (req, res) => {
 export {
     getAllRoadmaps,
     addRoadmap,
-    getRecomendedRoadmaps,
+    getRecommendedRoadmaps,
     deleteRoadmap,
     getCurrentUserRoadmaps,
     editRoadmapDetails,
