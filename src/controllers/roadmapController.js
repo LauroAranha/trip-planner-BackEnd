@@ -8,6 +8,10 @@ import {
     updateDocumentInCollection,
 } from '../models/firebase/firebaseOperations.js';
 import { listDocFromCollectionWithId } from '../models/firebase/firebaseOperations.js';
+import { getDownloadURL, getStorage, ref, uploadString } from 'firebase/storage';
+import { getMissingFields } from '../utils/getMissingFields.js';
+import { collection, getDocs, query, where } from 'firebase/firestore';
+import { db } from '../config/firebase.js';
 
 const removeEmptyAttrs = (obj) => {
     var entries = Object.entries(obj).filter(function (entry) {
@@ -22,26 +26,43 @@ const removeEmptyAttrs = (obj) => {
  */
 const getAllRoadmaps = async (req, res) => {
     try {
-        const results = await listAllDocsFromCollection('roadmap');
-        if (results != undefined || results != null) {
-            // Check if results array has data
-            res.status(200).send({
-                message: 'Data found successfully',
-                data: results,
+        listAllDocsFromCollection('roadmap')
+            .then((results) => {
+                if (results != undefined || results != null) {
+                    // Check if results array has data
+                    res.status(200).send({
+                        message: 'Dados encontrados com sucesso',
+                        data: results,
+                        hasError: false,
+                    });
+                } else {
+                    res.status(404).send({
+                        message: 'Nenhum dado encontrado',
+                        hasError: false,
+                    });
+                }
+            })
+            .catch((err) => {
+                logger.error(err);
+                res.status(500).send({
+                    message: 'Não foi possível fazer a consulta',
+                    hasError: true,
+                });
             });
-        } else {
-            res.status(404).send('No data found');
-        }
     } catch (err) {
-        res.status(500).send(err.toString());
+        logger.error(err);
+        res.status(500).send({
+            message: 'Aconteceu algo errado com a requisição',
+            hasError: true,
+        });
     }
 };
 
 /**
  * Add roadmap
  * @param {Object} payload
- * @param {String} payload.title
- * @param {String} payload.description
+ * @param {String} payload.titulo
+ * @param {String} payload.descricao
  * @param {String} payload.image
  * @param {boolean} payload.criancaOk
  * @param {boolean} payload.petOk
@@ -55,8 +76,8 @@ const getAllRoadmaps = async (req, res) => {
  * ```
  * Post example:
  * {
- *     "title": "Mockup Roteiro",
- *     "description": "Descrição maneira",
+ *     "titulo": "Mockup Roteiro",
+ *     "descricao": "Descrição maneira",
  *     "image": "https://i.pinimg.com/280x280_RS/3f/b5/27/3fb527a657ea80ec279e7b399a112929.jpg",
  *     "cidadeRoteiro": "Sao Paulo",
  *     "pontoInicial": "Ermelino Matarazzo",
@@ -76,64 +97,127 @@ const getAllRoadmaps = async (req, res) => {
  */
 const addRoadmap = async (req, res) => {
     try {
-        const results = await addDocInCollection('roadmap', req.body);
-        if (results) {
-            res.status(201).send('Document added succesfully');
+        const { body } = req;
+        const requiredFields = ["title", "description", "cidadeRoteiro", "pontoInicial", "pontoFinal", "recomendacaoTransporte", "petsOk", "criancaOk", "image"];
+        const missingFields = getMissingFields(body, requiredFields)
+
+        if (missingFields.length > 0) {
+            return res.status(400).json({ message: `Os seguintes campos são necessários: ${missingFields.join(", ")}.`, hasError: true });
+        }
+
+        // firestore doesnt support upload of large blobs, so we do some workaround xd
+        const tempImage = body.image;
+        body.image = null;
+
+        // we set the roadmaps as private for default
+        body.visibilidadePublica = false;
+
+        const result = await addDocInCollection('roadmap', body);
+
+        if (result) {
+            const storage = getStorage();
+            const imageRef = ref(storage, `roadmap_thumbs/${result.id}`);
+
+            await uploadString(imageRef, tempImage, 'data_url');
+            logger.info('Profile picture uploaded successfully!');
+            const urlImage = await getDownloadURL(imageRef);
+
+            updateDocumentInCollection('roadmap', result.id, { image: urlImage })
+
+            res.status(201).send({
+                message: 'Roteiro adicionado com sucesso',
+                hasError: false,
+            });
         } else {
-            res.status(500).send('Error');
+            throw new Error();
         }
     } catch (err) {
         logger.error(err);
-        res.status(500).send(err);
+        res.status(500).send({
+            message: 'Aconteceu algo errado com a requisição',
+            hasError: true,
+        });
     }
 };
 
-/**
- * Get the recommended roadmaps (basically all roadmaps that have a rating above 200)
- * @returns {Object} all roadmaps linked to certain user
- */
-const getRecomendedRoadmaps = async (req, res) => {
+const getRecommendedRoadmaps = async (req, res) => {
     try {
-        const results = await queryDocumentInCollection(
-            'roadmap',
-            'rating',
-            '>=',
-            200,
+        const roadmapRef = collection(db, 'roadmap');
+
+        // we need to create indexes in firebase in order to make compound queries, if there are no indexes created for some query,
+        // firebase will provide a link to automatically create it via an error message. 
+        const compoundQuery = query(
+            roadmapRef,
+            where('rating', '>=', 200),
+            where('visibilidadePublica', '==', true)
         );
-        if (results) {
+
+        const querySnapshot = await getDocs(compoundQuery);
+        const results = [];
+
+        querySnapshot.forEach((doc) => {
+            const data = doc.data();
+            const docId = doc.id;
+            results.push({ ...data, docId });
+        });
+
+        if (results.length) {
             res.status(200).send({
-                message: 'Data found successfully',
+                message: 'Dados encontrados com sucesso',
                 data: results,
+                hasError: false,
             });
         } else {
-            res.status(500).send('Error');
+            res.status(400).send({
+                message: 'Nenhum dado encontrado',
+                hasError: false,
+            });
         }
     } catch (err) {
         logger.error(err);
-        res.status(500).send(err);
+        res.status(500).send({
+            message: 'Não foi possível fazer a consulta',
+            hasError: true,
+        });
     }
 };
+
 
 const getPublicRoadmaps = async (req, res) => {
     try {
-        const results = await queryDocumentInCollection(
+        queryDocumentInCollection(
             'roadmap',
             'visibilidadePublica',
             '==',
-            (true || 'true'),
-        );
-        console.log(results);
-        if (results) {
-            res.status(200).send({
-                message: 'Data found successfully',
-                data: results,
+            true || 'true',
+        )
+            .then((results) => {
+                if (results) {
+                    res.status(200).send({
+                        message: 'Dados encontrados com sucesso',
+                        data: results,
+                        hasError: false,
+                    });
+                } else {
+                    res.status(500).send({
+                        message: 'Nenhum dado encontrado',
+                        hasError: false,
+                    });
+                }
+            })
+            .catch((err) => {
+                logger.error(err);
+                res.status(500).send({
+                    message: 'Não foi possível fazer a consulta',
+                    hasError: true,
+                });
             });
-        } else {
-            res.status(500).send('Error');
-        }
     } catch (err) {
         logger.error(err);
-        res.status(500).send(err);
+        res.status(500).send({
+            message: 'Aconteceu algo errado com a requisição',
+            hasError: true,
+        });
     }
 };
 
@@ -152,20 +236,33 @@ const getPublicRoadmaps = async (req, res) => {
  * ```
  */
 const deleteRoadmap = async (req, res) => {
-    const roadmapId = req.params.roadmapId;
     try {
-        const results = await deleteDocumentInCollection('roadmap', roadmapId);
-        if (results) {
-            res.status(200).send({
-                message: 'Document deleted successfully',
-                data: results,
+        const { roadmapId } = req.params;
+        deleteDocumentInCollection('roadmap', roadmapId)
+            .then((results) => {
+                if (results) {
+                    res.status(200).send({
+                        message: 'Roteiro excluído com sucesso',
+                        data: results,
+                        hasError: false,
+                    });
+                } else {
+                    throw Error();
+                }
+            })
+            .catch((err) => {
+                logger.error(err);
+                res.status(500).send({
+                    message: 'Falha ao editar',
+                    hasError: true,
+                });
             });
-        } else {
-            res.status(500).send('Error');
-        }
     } catch (err) {
         logger.error(err);
-        res.status(500).send(err);
+        res.status(500).send({
+            message: 'Aconteceu algo errado com a requisição',
+            hasError: true,
+        });
     }
 };
 
@@ -183,82 +280,107 @@ const deleteRoadmap = async (req, res) => {
  * ```
  */
 const getCurrentUserRoadmaps = async (req, res) => {
-    const userCreatorId = req.params.userId;
+    const { userId } = req.params;
     try {
-        const results = await queryDocumentInCollection(
-            'roadmap',
-            'userCreatorId',
-            '==',
-            userCreatorId,
-        );
-        if (results) {
-            res.status(200).send({
-                message: 'Data found successfully',
-                data: results,
+        queryDocumentInCollection('roadmap', 'userCreatorId', '==', userId)
+            .then((results) => {
+                if (results) {
+                    res.status(200).send({
+                        message: 'Dados encontrados com sucesso',
+                        data: results,
+                        hasError: false,
+                    });
+                } else {
+                    throw new Error();
+                }
+            })
+            .catch((err) => {
+                logger.error(err);
+                res.status(500).send({
+                    message: 'Falha ao editar',
+                    hasError: true,
+                });
             });
-        } else {
-            res.status(500).send('Error');
-        }
     } catch (err) {
         logger.error(err);
-        res.status(500).send(err);
+        res.status(500).send({
+            message: 'Aconteceu algo errado com a requisição',
+            hasError: true,
+        });
     }
 };
 
 const editRoadmapDetails = async (req, res) => {
-    const documentId = req.body.documentId;
+    const { documentId } = req.body;
     const newDocData = removeEmptyAttrs(req.body.newDocData);
 
     try {
-        const results = await updateDocumentInCollection(
-            'roadmap',
-            documentId,
-            newDocData,
-        );
-        if (results) {
-            res.status(200).send({
-                message: 'Update made successfully',
-                data: results,
+        updateDocumentInCollection('roadmap', documentId, newDocData)
+            .then((results) => {
+                if (results) {
+                    res.status(200).send({
+                        message: 'Roteiro editado com sucesso',
+                        data: results,
+                        hasError: false,
+                    });
+                } else {
+                    throw Error();
+                }
+            })
+            .catch((err) => {
+                logger.error(err);
+                res.status(500).send({
+                    message: 'Falha ao editar',
+                    hasError: true,
+                });
             });
-        } else {
-            res.status(500).send('Error');
-        }
     } catch (err) {
         logger.error(err);
-        res.status(500).send(err);
+        res.status(500).send({
+            message: 'Aconteceu algo errado com a requisição',
+            hasError: true,
+        });
     }
 };
 
 const getRoadmapDetails = async (req, res) => {
-    const documentId = req.params.roadmapId;
+    const { roadmapId } = req.params;
     try {
-        const results = await listDocFromCollectionWithId(
-            'roadmap',
-            documentId,
-        );
-        if (results) {
-            res.status(200).send({
-                message: 'Roadmap details found!',
-                data: results,
+        listDocFromCollectionWithId('roadmap', roadmapId)
+            .then((results) => {
+                if (results) {
+                    res.status(200).send({
+                        message: 'Detalhes do roteiro encontrados',
+                        data: results,
+                        hasError: false,
+                    });
+                } else {
+                    throw Error();
+                }
+            })
+            .catch((err) => {
+                logger.error(err);
+                res.status(500).send({
+                    message: 'Nenhum dado encontrado',
+                    hasError: true,
+                });
             });
-        } else {
-            res.status(404).send({
-                message: 'Roadmap details found!',
-            });
-        }
     } catch (err) {
         logger.error(err);
-        res.status(500).send(err);
+        res.status(500).send({
+            message: 'Aconteceu algo errado com a requisição',
+            hasError: true,
+        });
     }
 };
 
 export {
     getAllRoadmaps,
     addRoadmap,
-    getRecomendedRoadmaps,
+    getRecommendedRoadmaps,
     deleteRoadmap,
     getCurrentUserRoadmaps,
     editRoadmapDetails,
     getRoadmapDetails,
-    getPublicRoadmaps
+    getPublicRoadmaps,
 };

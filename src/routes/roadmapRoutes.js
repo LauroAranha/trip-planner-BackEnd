@@ -2,7 +2,6 @@ import express from 'express';
 
 const router = express.Router();
 
-import { logger } from '../utils/logger.js';
 import {
     addRoadmap,
     deleteRoadmap,
@@ -10,8 +9,8 @@ import {
     getAllRoadmaps,
     getCurrentUserRoadmaps,
     getPublicRoadmaps,
-    getRecomendedRoadmaps,
-    getRoadmapDetails
+    getRecommendedRoadmaps,
+    getRoadmapDetails,
 } from '../controllers/roadmapController.js';
 
 /**
@@ -28,7 +27,7 @@ router.get('/get/all', getAllRoadmaps);
  */
 router.post('/add', addRoadmap);
 
-router.get('/recommendedRoadmaps', getRecomendedRoadmaps);
+router.get('/getRecommendedRoadmaps', getRecommendedRoadmaps);
 
 router.get('/public', getPublicRoadmaps);
 

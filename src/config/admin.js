@@ -1,5 +1,9 @@
 import admin from 'firebase-admin';
-import serviceAccount from '../donotcommit/trip-planner-b0cfe-firebase-adminsdk-e4r7b-d2eb2a11d7.json' assert { type: 'json' };
+import * as dotenv from 'dotenv';
+
+dotenv.config();
+
+const serviceAccount = JSON.parse(process.env.SERVICE_ACCOUNT);
 
 export default admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),

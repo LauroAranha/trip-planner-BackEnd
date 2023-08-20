@@ -1,46 +1,32 @@
-import { deleteUser } from 'firebase/auth';
-import { auth, db } from '../../../config/firebase.js';
+import admin from 'firebase-admin';
 import { deleteDocumentInCollection } from '../firebaseOperations.js';
 import { errorHandler } from '../../../utils/firebaseErrorHandler.js';
-
 import { logger } from '../../../utils/logger.js';
-import { signIn } from './login.js';
 import { collection, getDocs, where, query } from 'firebase/firestore';
+import { db, storage } from '../../../config/firebase.js';
+import { deleteObject, ref } from 'firebase/storage';
 
-export const deleteUserFA = async (userInfo) => {
-    const email = userInfo.email;
-    const password = userInfo.password;
-    let user;
-    const a = await signIn({ email: email, password: password }).then(
-        async () => {
-            user = auth.currentUser;
-        },
-    );
-    a;
-    console.log(user);
+export const deleteUserFA = async (userId) => {
     try {
-        await deleteUser(user)
-            .then(async () => {
-                const docRef = await collection(db, 'users');
-                const { email } = user;
-                const emailQuery = await query(
-                    docRef,
-                    where('email', '==', email),
-                );
-                const querySnapshot = await getDocs(emailQuery);
-                let uid;
+        await admin.auth().deleteUser(userId);
+        console.log('Successfully deleted user from Authentication');
 
-                querySnapshot.forEach(async (doc) => {
-                    console.log(doc.id);
-                    uid = doc.id;
-                    await deleteDocumentInCollection('users', uid);
-                });
+        const docRef = collection(db, 'users');
+        const emailQuery = query(docRef, where('userId', '==', userId));
+        const querySnapshot = await getDocs(emailQuery);
 
-                logger.info('User deleted successfully!');
-            })
-            .catch((error) => {
-                console.log(error);
-            });
+        const imageRef = ref(storage, `profilePictures/${userId}`);
+        await deleteObject(imageRef)
+        console.log('Successfully deleted user from Storage');
+
+        querySnapshot.forEach(async (doc) => {
+            console.log(doc.id);
+            const uid = doc.id;
+            await deleteDocumentInCollection('users', uid);
+        });
+
+        console.log('Successfully deleted user from Firestore');
+        logger.info('User deleted successfully!');
     } catch (error) {
         errorHandler(error);
     }
