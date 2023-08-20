@@ -8,6 +8,8 @@ import {
     updateDocumentInCollection,
 } from '../models/firebase/firebaseOperations.js';
 import { listDocFromCollectionWithId } from '../models/firebase/firebaseOperations.js';
+import { getDownloadURL, getStorage, ref, uploadString } from 'firebase/storage';
+import { getMissingFields } from '../utils/getMissingFields.js';
 
 const removeEmptyAttrs = (obj) => {
     var entries = Object.entries(obj).filter(function (entry) {
@@ -93,24 +95,36 @@ const getAllRoadmaps = async (req, res) => {
  */
 const addRoadmap = async (req, res) => {
     try {
-        addDocInCollection('roadmap', req.body)
-            .then((results) => {
-                if (results) {
-                    res.status(201).send({
-                        message: 'Roteiro adicionado com sucesso',
-                        hasError: false,
-                    });
-                } else {
-                    throw Error();
-                }
-            })
-            .catch((err) => {
-                logger.error(err);
-                res.status(500).send({
-                    message: 'Erro ao criar o roteiro',
-                    hasError: true,
-                });
+        const { body } = req;
+        const requiredFields = ["title", "description", "cidadeRoteiro", "pontoInicial", "pontoFinal", "recomendacaoTransporte", "petsOk", "criancaOk", "imagem"];
+        const missingFields = getMissingFields(body, requiredFields)
+
+        if (missingFields.length > 0) {
+            return res.status(400).json({ message: `Os seguintes campos são necessários: ${missingFields.join(", ")}.`, hasError: true });
+        }
+
+        const tempImage = body.imagem;
+        body.imagem = null;
+
+        const result = await addDocInCollection('roadmap', body);
+
+        if (result) {
+            const storage = getStorage();
+            const imagemRef = ref(storage, `roadmap_thumbs/${result.id}`);
+
+            await uploadString(imagemRef, tempImage, 'data_url');
+            logger.info('Profile picture uploaded successfully!');
+            const urlImagem = await getDownloadURL(imagemRef);
+
+            updateDocumentInCollection('roadmap', result.id, { imagem: urlImagem })
+
+            res.status(201).send({
+                message: 'Roteiro adicionado com sucesso',
+                hasError: false,
             });
+        } else {
+            throw new Error();
+        }
     } catch (err) {
         logger.error(err);
         res.status(500).send({
