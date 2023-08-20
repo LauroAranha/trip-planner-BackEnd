@@ -9,7 +9,7 @@ import {
     getAllRoadmaps,
     getCurrentUserRoadmaps,
     getPublicRoadmaps,
-    getRecomendedRoadmaps,
+    getRecommendedRoadmaps,
     getRoadmapDetails,
 } from '../controllers/roadmapController.js';
 
@@ -27,7 +27,7 @@ router.get('/get/all', getAllRoadmaps);
  */
 router.post('/add', addRoadmap);
 
-router.get('/getRecommendedRoadmaps', getRecomendedRoadmaps);
+router.get('/getRecommendedRoadmaps', getRecommendedRoadmaps);
 
 router.get('/public', getPublicRoadmaps);
 
