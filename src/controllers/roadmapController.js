@@ -61,7 +61,7 @@ const getAllRoadmaps = async (req, res) => {
  * @param {Object} payload
  * @param {String} payload.titulo
  * @param {String} payload.descricao
- * @param {String} payload.imagem
+ * @param {String} payload.image
  * @param {boolean} payload.criancaOk
  * @param {boolean} payload.petOk
  * @param {String} payload.recomendacaoTransporte
@@ -76,7 +76,7 @@ const getAllRoadmaps = async (req, res) => {
  * {
  *     "titulo": "Mockup Roteiro",
  *     "descricao": "Descrição maneira",
- *     "imagem": "https://i.pinimg.com/280x280_RS/3f/b5/27/3fb527a657ea80ec279e7b399a112929.jpg",
+ *     "image": "https://i.pinimg.com/280x280_RS/3f/b5/27/3fb527a657ea80ec279e7b399a112929.jpg",
  *     "cidadeRoteiro": "Sao Paulo",
  *     "pontoInicial": "Ermelino Matarazzo",
  *     "pontoFinal": "Mooca",
@@ -96,27 +96,27 @@ const getAllRoadmaps = async (req, res) => {
 const addRoadmap = async (req, res) => {
     try {
         const { body } = req;
-        const requiredFields = ["title", "description", "cidadeRoteiro", "pontoInicial", "pontoFinal", "recomendacaoTransporte", "petsOk", "criancaOk", "imagem"];
+        const requiredFields = ["title", "description", "cidadeRoteiro", "pontoInicial", "pontoFinal", "recomendacaoTransporte", "petsOk", "criancaOk", "image"];
         const missingFields = getMissingFields(body, requiredFields)
 
         if (missingFields.length > 0) {
             return res.status(400).json({ message: `Os seguintes campos são necessários: ${missingFields.join(", ")}.`, hasError: true });
         }
 
-        const tempImage = body.imagem;
-        body.imagem = null;
+        const tempImage = body.image;
+        body.image = null;
 
         const result = await addDocInCollection('roadmap', body);
 
         if (result) {
             const storage = getStorage();
-            const imagemRef = ref(storage, `roadmap_thumbs/${result.id}`);
+            const imageRef = ref(storage, `roadmap_thumbs/${result.id}`);
 
-            await uploadString(imagemRef, tempImage, 'data_url');
+            await uploadString(imageRef, tempImage, 'data_url');
             logger.info('Profile picture uploaded successfully!');
-            const urlImagem = await getDownloadURL(imagemRef);
+            const urlImage = await getDownloadURL(imageRef);
 
-            updateDocumentInCollection('roadmap', result.id, { imagem: urlImagem })
+            updateDocumentInCollection('roadmap', result.id, { image: urlimage })
 
             res.status(201).send({
                 message: 'Roteiro adicionado com sucesso',
