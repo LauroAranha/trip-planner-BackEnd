@@ -103,8 +103,12 @@ const addRoadmap = async (req, res) => {
             return res.status(400).json({ message: `Os seguintes campos são necessários: ${missingFields.join(", ")}.`, hasError: true });
         }
 
+        // firestore doesnt support upload of large blobs, so we do some workaround xd
         const tempImage = body.image;
         body.image = null;
+
+        // we set the roadmaps as private for default
+        body.visibilidadePublica = false;
 
         const result = await addDocInCollection('roadmap', body);
 
