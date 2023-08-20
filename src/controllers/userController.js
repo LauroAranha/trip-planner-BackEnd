@@ -7,18 +7,7 @@ import { queryDocumentInCollection } from '../models/firebase/firebaseOperations
 
 import { deleteUserFA } from '../models/firebase/userAuth/deleteUser.js';
 import { editUserFA } from '../models/firebase/userAuth/editUser.js';
-
-const getMissingFields = (requestBody, requiredFields) => {
-    const missingFields = [];
-
-    requiredFields.forEach((field) => {
-        if (!requestBody[field]) {
-            missingFields.push(field);
-        }
-    });
-
-    return missingFields;
-}
+import { getMissingFields } from '../utils/getMissingFields.js';
 
 const registerUser = async (req, res) => {
     try {
