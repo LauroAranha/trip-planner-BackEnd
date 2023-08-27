@@ -374,6 +374,32 @@ const getRoadmapDetails = async (req, res) => {
     }
 };
 
+const reportRoadmap = async (req, res) => {
+    try {
+        const { body } = req;
+
+        const requiredFields = ["roadmapId", "reason", "description"];
+        const missingFields = getMissingFields(body, requiredFields)
+
+        const result = await addDocInCollection('reported-roadmap', body);
+
+        if (result) {
+            res.status(201).send({
+                message: 'Denuncia adicionada com sucesso',
+                hasError: false,
+            });
+        } else {
+            throw new Error();
+        }
+    } catch (err) {
+        logger.error(err);
+        res.status(500).send({
+            message: 'Aconteceu algo errado com a requisição',
+            hasError: true,
+        });
+    }
+};
+
 export {
     getAllRoadmaps,
     addRoadmap,
@@ -383,4 +409,5 @@ export {
     editRoadmapDetails,
     getRoadmapDetails,
     getPublicRoadmaps,
+    reportRoadmap
 };

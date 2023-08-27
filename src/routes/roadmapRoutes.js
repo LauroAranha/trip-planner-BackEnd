@@ -11,6 +11,7 @@ import {
     getPublicRoadmaps,
     getRecommendedRoadmaps,
     getRoadmapDetails,
+    reportRoadmap
 } from '../controllers/roadmapController.js';
 
 /**
@@ -38,5 +39,7 @@ router.get('/get/:roadmapId', getRoadmapDetails);
 router.get('/getCurrentUserRoadmaps/:userId', getCurrentUserRoadmaps);
 
 router.put('/edit', editRoadmapDetails);
+
+router.post('/report', reportRoadmap);
 
 export default router;
